@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parcours Fractions — Mon chemin d'apprentissage</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Architects+Daughter&display=swap');
+
+:root {
+  --bg: #f8f6f1;
+  --bg-card: #ffffff;
+  --text: #2d2a26;
+  --text-light: #6b6760;
+  --text-muted: #9e9a92;
+  --shadow: rgba(45,42,38,0.08);
+  --shadow-hover: rgba(45,42,38,0.15);
+  --radius: 16px;
+  --radius-sm: 10px;
+
+  /* Module colors */
+  --c-add: #E8890C;
+  --c-add-bg: #FFF7ED;
+  --c-add-light: #FDE8C8;
+
+  --c-red: #2D8C56;
+  --c-red-bg: #EEFBF3;
+  --c-red-light: #C7F0D8;
+
+  --c-mul: #2563EB;
+  --c-mul-bg: #EFF6FF;
+  --c-mul-light: #BFDBFE;
+
+  --c-div: #7C3AED;
+  --c-div-bg: #F5F3FF;
+  --c-div-light: #DDD6FE;
+
+  --c-cpx: #DC2626;
+  --c-cpx-bg: #FEF2F2;
+  --c-cpx-light: #FECACA;
+
+  --trail-color: #d6d3cc;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+}
+
+/* ─── HEADER ─── */
+.hero {
+  text-align: center;
+  padding: 50px 24px 40px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 30%, rgba(232,137,12,0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 60%, rgba(37,99,235,0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 90%, rgba(124,58,237,0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+.hero-emoji {
+  font-size: 52px;
+  display: block;
+  margin-bottom: 12px;
+  animation: float 3s ease-in-out infinite;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.hero h1 {
+  font-family: 'Architects Daughter', cursive;
+  font-size: clamp(28px, 5vw, 42px);
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--text-light);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ─── PROGRESS BAR ─── */
+.progress-strip {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.progress-dot {
+  width: 38px;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--trail-color);
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  position: relative;
+}
+.progress-dot:hover {
+  transform: scaleY(1.6);
+}
+.progress-dot[data-group="add"] { background: var(--c-add-light); }
+.progress-dot[data-group="add"]:hover, .progress-dot[data-group="add"].active { background: var(--c-add); }
+.progress-dot[data-group="red"] { background: var(--c-red-light); }
+.progress-dot[data-group="red"]:hover, .progress-dot[data-group="red"].active { background: var(--c-red); }
+.progress-dot[data-group="mul"] { background: var(--c-mul-light); }
+.progress-dot[data-group="mul"]:hover, .progress-dot[data-group="mul"].active { background: var(--c-mul); }
+.progress-dot[data-group="div"] { background: var(--c-div-light); }
+.progress-dot[data-group="div"]:hover, .progress-dot[data-group="div"].active { background: var(--c-div); }
+.progress-dot[data-group="cpx"] { background: var(--c-cpx-light); }
+.progress-dot[data-group="cpx"]:hover, .progress-dot[data-group="cpx"].active { background: var(--c-cpx); }
+
+/* ─── MAIN TRAIL ─── */
+.trail {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 20px 24px 60px;
+  position: relative;
+}
+
+/* Vertical connector line */
+.trail::before {
+  content: '';
+  position: absolute;
+  left: 56px;
+  top: 0;
+  bottom: 60px;
+  width: 4px;
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--trail-color) 0px,
+    var(--trail-color) 8px,
+    transparent 8px,
+    transparent 16px
+  );
+  border-radius: 2px;
+}
+@media (max-width: 600px) {
+  .trail::before { left: 32px; }
+}
+
+/* ─── MODULE BLOCK ─── */
+.module {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.module-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  padding: 20px 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: box-shadow 0.3s, transform 0.2s;
+  position: relative;
+  z-index: 2;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.module-header:hover {
+  box-shadow: 0 4px 20px var(--shadow-hover);
+  transform: translateX(4px);
+}
+.module-header:active {
+  transform: translateX(2px) scale(0.995);
+}
+
+.module-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.module-info { flex: 1; min-width: 0; }
+.module-step {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+.module-name {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--text);
+}
+.module-count {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.module-chevron {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--bg);
+  transition: transform 0.3s ease, background 0.3s;
+  flex-shrink: 0;
+}
+.module.open .module-chevron {
+  transform: rotate(180deg);
+}
+
+/* ─── CARD LIST (collapsible) ─── */
+.module-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 56px;
+  padding-left: 24px;
+  position: relative;
+}
+@media (max-width: 600px) {
+  .module-body { margin-left: 20px; padding-left: 16px; }
+}
+.module.open .module-body {
+  max-height: 2000px;
+}
+
+.card {
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  margin-top: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px var(--shadow);
+  transition: box-shadow 0.3s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
+  border: 2px solid transparent;
+}
+.card:hover {
+  box-shadow: 0 4px 16px var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.card-accent {
+  width: 6px;
+  flex-shrink: 0;
+}
+
+.card-content {
+  padding: 16px 20px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.card-desc {
+  font-size: 14px;
+  color: var(--text-light);
+  line-height: 1.55;
+}
+
+.card-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  font-size: 20px;
+  color: var(--text-muted);
+  transition: color 0.2s, transform 0.2s;
+}
+.card:hover .card-arrow {
+  transform: translateX(4px);
+}
+
+/* PDF card variant */
+.card-pdf .card-tag { font-size: 10px; }
+.card-pdf .card-arrow::before { content: '📄'; font-size: 18px; }
+
+/* Interactive card variant */
+.card-interactive .card-arrow::before { content: '→'; }
+
+/* ─── MODULE COLOR THEMES ─── */
+.module--add .module-icon { background: var(--c-add-bg); color: var(--c-add); }
+.module--add .module-step { color: var(--c-add); }
+.module--add .card:hover { border-color: var(--c-add-light); }
+.module--add .card-accent { background: var(--c-add); }
+.module--add .card-tag { background: var(--c-add-bg); color: var(--c-add); }
+.module--add .card:hover .card-arrow { color: var(--c-add); }
+
+.module--red .module-icon { background: var(--c-red-bg); color: var(--c-red); }
+.module--red .module-step { color: var(--c-red); }
+.module--red .card:hover { border-color: var(--c-red-light); }
+.module--red .card-accent { background: var(--c-red); }
+.module--red .card-tag { background: var(--c-red-bg); color: var(--c-red); }
+.module--red .card:hover .card-arrow { color: var(--c-red); }
+
+.module--mul .module-icon { background: var(--c-mul-bg); color: var(--c-mul); }
+.module--mul .module-step { color: var(--c-mul); }
+.module--mul .card:hover { border-color: var(--c-mul-light); }
+.module--mul .card-accent { background: var(--c-mul); }
+.module--mul .card-tag { background: var(--c-mul-bg); color: var(--c-mul); }
+.module--mul .card:hover .card-arrow { color: var(--c-mul); }
+
+.module--div .module-icon { background: var(--c-div-bg); color: var(--c-div); }
+.module--div .module-step { color: var(--c-div); }
+.module--div .card:hover { border-color: var(--c-div-light); }
+.module--div .card-accent { background: var(--c-div); }
+.module--div .card-tag { background: var(--c-div-bg); color: var(--c-div); }
+.module--div .card:hover .card-arrow { color: var(--c-div); }
+
+.module--cpx .module-icon { background: var(--c-cpx-bg); color: var(--c-cpx); }
+.module--cpx .module-step { color: var(--c-cpx); }
+.module--cpx .card:hover { border-color: var(--c-cpx-light); }
+.module--cpx .card-accent { background: var(--c-cpx); }
+.module--cpx .card-tag { background: var(--c-cpx-bg); color: var(--c-cpx); }
+.module--cpx .card:hover .card-arrow { color: var(--c-cpx); }
+
+/* ─── FOOTER ─── */
+.footer {
+  text-align: center;
+  padding: 40px 24px;
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 780px;
+  margin: 0 auto;
+  border-top: 1px dashed var(--trail-color);
+}
+
+/* ─── EXPAND ALL BUTTON ─── */
+.expand-all {
+  display: block;
+  margin: 0 auto 20px;
+  padding: 8px 20px;
+  border: 2px solid var(--trail-color);
+  background: var(--bg-card);
+  border-radius: 24px;
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.expand-all:hover {
+  border-color: var(--text-light);
+  color: var(--text);
+  transform: scale(1.03);
+}
+
+/* ─── ANIMATIONS ─── */
+.module {
+  opacity: 0;
+  transform: translateY(24px);
+  animation: slideUp 0.5s ease forwards;
+}
+.module:nth-child(1) { animation-delay: 0.1s; }
+.module:nth-child(2) { animation-delay: 0.2s; }
+.module:nth-child(3) { animation-delay: 0.3s; }
+.module:nth-child(4) { animation-delay: 0.4s; }
+.module:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes slideUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 600px) {
+  .hero { padding: 36px 16px 28px; }
+  .hero h1 { font-size: 26px; }
+  .trail { padding: 16px 12px 40px; }
+  .module-header { padding: 16px; gap: 12px; }
+  .module-icon { width: 44px; height: 44px; font-size: 22px; border-radius: 12px; }
+  .module-name { font-size: 17px; }
+  .card-content { padding: 12px 14px; }
+}
+
+/* ─── PRINT ─── */
+@media print {
+  .module-body { max-height: none !important; }
+  .module-chevron, .expand-all, .progress-strip { display: none; }
+  .module { opacity: 1; transform: none; animation: none; }
+  .card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════ HEADER ════════════ -->
+<header class="hero">
+  <span class="hero-emoji">🧮</span>
+  <h1>Mon Parcours sur les Fractions</h1>
+  <p>Bienvenue ! Suis le chemin étape par étape pour devenir un&middot;e pro des fractions. Clique sur chaque module pour découvrir les outils.</p>
+
+  <div class="progress-strip" aria-hidden="true">
+    <div class="progress-dot" data-group="add" title="Addition & Soustraction"></div>
+    <div class="progress-dot" data-group="add" title="Addition & Soustraction"></div>
+    <div class="progress-dot" data-group="add" title="Addition & Soustraction"></div>
+    <div class="progress-dot" data-group="add" title="Addition & Soustraction"></div>
+    <div class="progress-dot" data-group="add" title="Addition & Soustraction"></div>
+    <div class="progress-dot" data-group="red" title="Réduction"></div>
+    <div class="progress-dot" data-group="red" title="Réduction"></div>
+    <div class="progress-dot" data-group="mul" title="Multiplication"></div>
+    <div class="progress-dot" data-group="mul" title="Multiplication"></div>
+    <div class="progress-dot" data-group="mul" title="Multiplication"></div>
+    <div class="progress-dot" data-group="mul" title="Multiplication"></div>
+    <div class="progress-dot" data-group="mul" title="Multiplication"></div>
+    <div class="progress-dot" data-group="div" title="Division"></div>
+    <div class="progress-dot" data-group="cpx" title="Calculs complexes"></div>
+    <div class="progress-dot" data-group="cpx" title="Calculs complexes"></div>
+    <div class="progress-dot" data-group="cpx" title="Calculs complexes"></div>
+  </div>
+</header>
+
+<!-- ════════════ MAIN TRAIL ════════════ -->
+<main class="trail">
+  <button class="expand-all" id="expandAll">▸ Tout déplier</button>
+
+  <!-- ── MODULE 1 : Addition & Soustraction (0x) ── -->
+  <div class="module module--add" id="mod-add">
+    <div class="module-header" role="button" aria-expanded="false" tabindex="0">
+      <div class="module-icon">➕</div>
+      <div class="module-info">
+        <div class="module-step">Étape 1</div>
+        <div class="module-name">Addition &amp; Soustraction</div>
+        <div class="module-count">5 activités — Les bases visuelles</div>
+      </div>
+      <div class="module-chevron">▾</div>
+    </div>
+    <div class="module-body">
+
+      <a href="01-Tests_sur_les_additions_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🎯 Visuel</div>
+          <div class="card-title">Le dénominateur commun — Addition</div>
+          <div class="card-desc">Découpe les parts de camembert pour additionner la fraction bleue et la verte. Comprends visuellement pourquoi on a besoin d'un dénominateur commun.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="01-Tests_sur_les_soustraction_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🎯 Visuel</div>
+          <div class="card-title">Le dénominateur commun — Soustraction</div>
+          <div class="card-desc">Même principe qu'avec l'addition, mais cette fois on enlève des parts. La fraction bleue moins la fraction rouge.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="02-feuille_addition_Simple_ALF_V1_1.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">✏️ Exercice</div>
+          <div class="card-title">Addition simple — Décomposition</div>
+          <div class="card-desc">Apprends à additionner deux fractions en décomposant les dénominateurs. La méthode pas-à-pas pour trouver le bon dénominateur commun.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="05-feuille_decomposition_v3_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🔧 Outil</div>
+          <div class="card-title">Décomposition en facteurs premiers</div>
+          <div class="card-desc">Découpe un nombre en ses facteurs premiers. L'outil indispensable pour simplifier et trouver le PPCM.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="07-addition-fractions_Complexe_V2_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">⭐ Avancé</div>
+          <div class="card-title">Addition de fractions — Niveau complexe</div>
+          <div class="card-desc">Des additions avec des dénominateurs plus grands et des étapes de simplification. Tu maîtrises les bases ? Passe au niveau suivant !</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── MODULE 2 : Réduction (1x) ── -->
+  <div class="module module--red" id="mod-red">
+    <div class="module-header" role="button" aria-expanded="false" tabindex="0">
+      <div class="module-icon">✂️</div>
+      <div class="module-info">
+        <div class="module-step">Étape 2</div>
+        <div class="module-name">Réduction des fractions</div>
+        <div class="module-count">2 fiches PDF — Rendre irréductible</div>
+      </div>
+      <div class="module-chevron">▾</div>
+    </div>
+    <div class="module-body">
+
+      <a href="10-Réduction_des_fractions_ALF_V1_0.pdf" target="_blank" class="card card-pdf">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">📄 PDF</div>
+          <div class="card-title">Réduction des fractions — Fiche complète</div>
+          <div class="card-desc">La méthode pour rendre une fraction irréductible en divisant numérateur et dénominateur par leurs diviseurs communs.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="11-Réduction_des_fractions_étapes_1_ALF_V1_0.pdf" target="_blank" class="card card-pdf">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">📄 PDF</div>
+          <div class="card-title">Réduction des fractions — Par étapes</div>
+          <div class="card-desc">Version guidée étape par étape pour bien comprendre le processus de simplification progressive.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── MODULE 3 : Multiplication (4x) ── -->
+  <div class="module module--mul" id="mod-mul">
+    <div class="module-header" role="button" aria-expanded="false" tabindex="0">
+      <div class="module-icon">✖️</div>
+      <div class="module-info">
+        <div class="module-step">Étape 3</div>
+        <div class="module-name">Multiplication</div>
+        <div class="module-count">5 activités — Du simple aux signes</div>
+      </div>
+      <div class="module-chevron">▾</div>
+    </div>
+    <div class="module-body">
+
+      <a href="40-feuille_Multiplication_GEMINI_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">✏️ Exercice</div>
+          <div class="card-title">Multiplication — Décomposition</div>
+          <div class="card-desc">Multiplie deux fractions en décomposant numérateurs et dénominateurs en facteurs premiers pour simplifier avant de calculer.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="41-multiplication-fractions_CLAUDE_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">✏️ Exercice</div>
+          <div class="card-title">Multiplication — Simplification croisée</div>
+          <div class="card-desc">Barre les nombres identiques en haut et en bas pour simplifier avant de multiplier. La technique qui fait gagner du temps !</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="42-simplification_fractions_puissances_CLAUDE_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🔧 Outil</div>
+          <div class="card-title">Simplification avec puissances</div>
+          <div class="card-desc">Utilise les nombres premiers et les puissances pour rendre une fraction irréductible. Idéal pour les grands nombres.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="45-feuille_Multiplication_Signe_Complexe_GEMINI_ALF_V2_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">⭐ Avancé</div>
+          <div class="card-title">Multiplication avec signes — Décomposition</div>
+          <div class="card-desc">Intègre la règle des signes (+ et −) dans tes multiplications avec décomposition en facteurs premiers.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="46-multiplication-fractions_Signe_CLAUDE_ALF_V2_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">⭐ Avancé</div>
+          <div class="card-title">Multiplication avec signes — Simplification</div>
+          <div class="card-desc">Combine la règle des signes et la simplification croisée. Le niveau complet de la multiplication !</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── MODULE 4 : Division (5x) ── -->
+  <div class="module module--div" id="mod-div">
+    <div class="module-header" role="button" aria-expanded="false" tabindex="0">
+      <div class="module-icon">➗</div>
+      <div class="module-info">
+        <div class="module-step">Étape 4</div>
+        <div class="module-name">Division</div>
+        <div class="module-count">1 activité — Inverser et multiplier</div>
+      </div>
+      <div class="module-chevron">▾</div>
+    </div>
+    <div class="module-body">
+
+      <a href="50-feuille_Division_GEMINI_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">✏️ Exercice</div>
+          <div class="card-title">Division de fractions</div>
+          <div class="card-desc">Apprends la technique : on inverse la deuxième fraction puis on multiplie. Avec décomposition et simplification intégrées.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ── MODULE 5 : Calculs Complexes 3ème (6x) ── -->
+  <div class="module module--cpx" id="mod-cpx">
+    <div class="module-header" role="button" aria-expanded="false" tabindex="0">
+      <div class="module-icon">🧠</div>
+      <div class="module-info">
+        <div class="module-step">Étape 5</div>
+        <div class="module-name">Calculs complexes — Niveau 3<sup>e</sup></div>
+        <div class="module-count">3 activités — Priorités, racines, puissances</div>
+      </div>
+      <div class="module-chevron">▾</div>
+    </div>
+    <div class="module-body">
+
+      <a href="00-concept-map-Défintion_v4.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🗺️ Carte</div>
+          <div class="card-title">Carte mentale — Les 14 types de calculs</div>
+          <div class="card-desc">Explore la carte interactive pour comprendre le lien entre toutes les règles : priorités, racines carrées, puissances, fractions imbriquées…</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="61-fractions_complexes_3e_CLAUDE.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🎯 Guidé</div>
+          <div class="card-title">Entraînement guidé — Les 14 types</div>
+          <div class="card-desc">Choisis un type de calcul complexe et suis les étapes de résolution pas-à-pas. Idéal pour préparer le brevet.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+      <a href="60-Calculs_Complexes_GEMINI_ALF_V1_0.html" target="_blank" class="card card-interactive">
+        <div class="card-accent"></div>
+        <div class="card-content">
+          <div class="card-tag">🔧 Vérificateur</div>
+          <div class="card-title">Calculateur exact</div>
+          <div class="card-desc">Tape ton propre calcul de fractions complexe et vérifie le résultat étape par étape. Parfait pour vérifier tes exercices.</div>
+        </div>
+        <div class="card-arrow"></div>
+      </a>
+
+    </div>
+  </div>
+
+</main>
+
+<!-- ════════════ FOOTER ════════════ -->
+<footer class="footer">
+  <p>🛠️ Parcours créé pour apprendre les fractions à ton rythme — 16 ressources interactives</p>
+  <p style="margin-top:6px;">Astuce : utilise <strong>Ctrl + clic</strong> pour ouvrir dans un nouvel onglet sans quitter cette page.</p>
+</footer>
+
+<!-- ════════════ SCRIPT ════════════ -->
+<script>
+(function(){
+  // Toggle modules
+  document.querySelectorAll('.module-header').forEach(function(header) {
+    header.addEventListener('click', function() {
+      var mod = this.closest('.module');
+      mod.classList.toggle('open');
+      this.setAttribute('aria-expanded', mod.classList.contains('open'));
+    });
+    header.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        this.click();
+      }
+    });
+  });
+
+  // Expand/collapse all
+  var expandBtn = document.getElementById('expandAll');
+  var allOpen = false;
+  expandBtn.addEventListener('click', function() {
+    allOpen = !allOpen;
+    document.querySelectorAll('.module').forEach(function(mod) {
+      if (allOpen) mod.classList.add('open');
+      else mod.classList.remove('open');
+      mod.querySelector('.module-header').setAttribute('aria-expanded', allOpen);
+    });
+    expandBtn.textContent = allOpen ? '▾ Tout replier' : '▸ Tout déplier';
+  });
+
+  // Open first module by default
+  var first = document.querySelector('.module');
+  if (first) {
+    first.classList.add('open');
+    first.querySelector('.module-header').setAttribute('aria-expanded', 'true');
+  }
+})();
+</script>
+
+</body>
+</html>

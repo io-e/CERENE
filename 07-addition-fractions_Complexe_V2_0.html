@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addition de fractions</title>
+<style>
+  :root {
+    --bg1: #ffffff; --bg2: #f5f4ef; --bg3: #eeede8;
+    --tx1: #1a1a18; --tx2: #5f5e5a; --tx3: #888780;
+    --bd1: rgba(0,0,0,.4); --bd2: rgba(0,0,0,.3); --bd3: rgba(0,0,0,.15);
+  }
+  @media (prefers-color-scheme: dark) { :root {
+    --bg1: #1e1e1c; --bg2: #2a2a27; --bg3: #333330;
+    --tx1: #e8e6de; --tx2: #9c9a92; --tx3: #6e6d67;
+    --bd1: rgba(255,255,255,.4); --bd2: rgba(255,255,255,.3); --bd3: rgba(255,255,255,.15);
+  }}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, sans-serif; font-size: 16px; background: var(--bg3); min-height: 100vh; padding: 2rem 1rem; }
+  .page { max-width: 860px; margin: 0 auto; background: var(--bg1); border-radius: 12px; border: .5px solid var(--bd3); padding: 2rem; }
+  .sheet { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  /* ── Saisie en ligne ── */
+  .input-line { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
+  .ifrac { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .ifrac input {
+    width: 82px; text-align: center; font-size: 24px; font-weight: 500;
+    border: .5px solid var(--bd2); border-radius: 8px; padding: 5px 8px;
+    background: var(--bg1); color: var(--tx1);
+  }
+  .fsep { width: 96px; height: 2px; background: var(--tx1); }
+  .opsign { font-size: 34px; color: var(--tx1); font-weight: 300; }
+  .btn { padding: 9px 22px; border-radius: 8px; border: .5px solid var(--bd2); background: var(--bg2); color: var(--tx1); font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn:hover { background: var(--bg3); }
+  .btn:active { transform: scale(.97); }
+
+  /* ── Légende ── */
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 14px; color: var(--tx2); justify-content: center; }
+  .ldot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; vertical-align: middle; margin-right: 4px; }
+
+  /* ── Décompositions ── */
+  .dcols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .dbox { border: .5px solid var(--bd3); border-radius: 10px; padding: .85rem 1rem; }
+  .dtitle { font-size: 15px; font-weight: 500; color: var(--tx2); margin-bottom: .75rem; text-align: center; }
+  .potence { border-collapse: collapse; margin: 0 auto; font-size: 17px; }
+  .potence td { padding: 3px 10px; color: var(--tx1); line-height: 1.5; }
+  .potence td.q { text-align: right; min-width: 52px; border-right: 2px solid var(--tx1); }
+  .potence td.d { padding-left: 12px; color: var(--tx2); }
+  .potence tr:first-child td.d { border-bottom: 2px solid var(--tx1); }
+  .potence tr.end td.q { color: var(--tx3); font-style: italic; }
+  .dresult { margin-top: .6rem; font-size: 14px; color: var(--tx2); text-align: center; }
+  .dbadges { margin-top: .45rem; display: flex; gap: 5px; justify-content: center; flex-wrap: wrap; align-items: center; }
+
+  /* ── Badges ── */
+  .fc { background: #FBEAF0; color: #993556; border: 1.5px solid #993556; border-radius: 6px; padding: 2px 9px; font-size: 17px; font-weight: 700; }
+  .fb { background: #E6F1FB; color: #185FA5; border: 1.5px solid #185FA5; border-radius: 6px; padding: 2px 9px; font-size: 17px; font-weight: 700; }
+  .fd { background: #EAF3DE; color: #3B6D11; border: 1.5px solid #3B6D11; border-radius: 6px; padding: 2px 9px; font-size: 17px; font-weight: 700; }
+  .tx { color: var(--tx3); font-size: 13px; }
+
+  /* ── PGCD / PPCM ── */
+  .pprow { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  .ppbox { border: .5px solid var(--bd3); border-radius: 10px; padding: .75rem 1rem; text-align: center; }
+  .pplabel { font-size: 13px; color: var(--tx3); margin-bottom: .4rem; }
+  .ppval { font-size: 22px; font-weight: 600; color: var(--tx1); }
+  .ppdetail { font-size: 13px; color: var(--tx2); margin-top: .3rem; }
+
+  /* ── Section calcul ── */
+  .calcsec { border: .5px solid var(--bd3); border-radius: 10px; padding: .9rem 1.2rem; }
+  .calclabel { font-size: 14px; font-weight: 500; color: var(--tx2); margin-bottom: .85rem; }
+  .calcsteps { display: flex; flex-direction: column; gap: .9rem; }
+  .step { display: flex; align-items: center; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+
+  /* ── Fraction inline ── */
+  .fi { display: inline-grid; grid-template-columns: max-content; justify-items: center; vertical-align: middle; margin: 0 4px; }
+  .fi-t { padding-bottom: 3px; white-space: nowrap; font-size: 18px; }
+  .fi-b { height: 2px; justify-self: stretch; background: var(--tx1); }
+  .fi-d { padding-top: 3px; white-space: nowrap; font-size: 18px; }
+
+  .eqs { color: var(--tx3); font-size: 20px; }
+  .pls { color: var(--tx1); font-size: 24px; font-weight: 300; }
+  .note { font-size: 13px; color: var(--tx3); font-style: italic; }
+  .simpbadge { display: inline-block; background: #FFF3CD; border: 1px solid #E6A817; color: #7A5800; border-radius: 6px; padding: 2px 10px; font-size: 14px; font-weight: 500; }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: .5px solid var(--bd3); margin: 0; }
+
+  /* ── Réponse ── */
+  .ansrow { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .anslabel { font-size: 15px; font-weight: 500; color: var(--tx2); }
+  .ansbox {
+    border: 2px dashed var(--bd2); border-radius: 10px;
+    padding: .75rem 1.75rem; min-width: 150px; min-height: 72px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 500; color: var(--tx3);
+    cursor: text; outline: none;
+  }
+  .ansbox:focus { border-color: var(--bd1); }
+  .empty { text-align: center; color: var(--tx3); font-size: 14px; padding: .4rem 0; }
+</style>
+</head>
+<body>
+<div class="page"><div class="sheet">
+
+  <!-- ── Saisie en ligne ── -->
+  <div class="input-line">
+    <div class="ifrac">
+      <input type="number" id="a" value="2">
+      <div class="fsep"></div>
+      <input type="number" id="b" value="9" min="2" max="9999">
+    </div>
+    <span class="opsign">+</span>
+    <div class="ifrac">
+      <input type="number" id="c" value="5">
+      <div class="fsep"></div>
+      <input type="number" id="d" value="12" min="2" max="9999">
+    </div>
+    <button class="btn" onclick="compute()">Calculer ↗</button>
+  </div>
+
+  <!-- ── Légende ── -->
+  <div class="legend" id="legend" style="display:none">
+    <span><span class="ldot" style="background:#FBEAF0;border:1.5px solid #993556"></span>Facteur commun → PGCD</span>
+    <span><span class="ldot" style="background:#E6F1FB;border:1.5px solid #185FA5"></span>Facteur de b seul</span>
+    <span><span class="ldot" style="background:#EAF3DE;border:1.5px solid #3B6D11"></span>Facteur de d seul</span>
+  </div>
+
+  <!-- ── Décompositions des dénominateurs ── -->
+  <div class="dcols" id="dcols">
+    <div class="dbox"><div class="empty">—</div></div>
+    <div class="dbox"><div class="empty">—</div></div>
+  </div>
+
+  <!-- ── PGCD et PPCM ── -->
+  <div class="pprow" id="pprow" style="display:none">
+    <div class="ppbox">
+      <div class="pplabel">PGCD(b, d) — facteurs communs</div>
+      <div class="ppval" id="pgcdv">—</div>
+      <div class="ppdetail" id="pgcdd"></div>
+    </div>
+    <div class="ppbox">
+      <div class="pplabel">PPCM(b, d) = b × d ÷ PGCD</div>
+      <div class="ppval" id="ppcmv">—</div>
+      <div class="ppdetail" id="ppcmd"></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Calcul ── -->
+  <div class="calcsec" id="calcsec" style="display:none">
+    <div class="calclabel">Calcul de l'addition</div>
+    <div class="calcsteps" id="calcsteps"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Réponse ── -->
+  <div class="ansrow">
+    <div class="anslabel">Résultat simplifié :</div>
+    <div class="ansbox" contenteditable="true" spellcheck="false" id="answer"></div>
+  </div>
+
+</div></div>
+
+<script>
+/* ── Utilitaires ── */
+function pf(n) {
+  const s = [], f = []; let d = 2;
+  while (n > 1) {
+    if (n % d === 0) { s.push([n, d]); f.push(d); n = Math.floor(n / d); }
+    else d++;
+  }
+  return { s, f };
+}
+function gcd(a, b) { a = Math.abs(a); b = Math.abs(b); return b === 0 ? a : gcd(b, a % b); }
+function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+
+/* ── Table potence ── */
+function potence(steps) {
+  if (!steps.length) return '<div class="note" style="text-align:center">Entier</div>';
+  let h = '<table class="potence">';
+  steps.forEach(([q, d], i) => {
+    h += `<tr${i === steps.length - 1 ? ' class="end"' : ''}><td class="q">${q}</td><td class="d">${d}</td></tr>`;
+  });
+  return h + '<tr class="end"><td class="q">1</td><td class="d"></td></tr></table>';
+}
+
+/* ── Badges colorés ── */
+function mkbadges(fs, other, cls) {
+  const pool = [...other], t = '<span class="tx"> × </span>';
+  return fs.map(f => {
+    const i = pool.indexOf(f);
+    if (i >= 0) { pool.splice(i, 1); return `<span class="fc">${f}</span>`; }
+    return `<span class="${cls}">${f}</span>`;
+  }).join(t);
+}
+
+/* ── Fraction inline ── */
+function fi(n, d) {
+  return `<span class="fi"><span class="fi-t">${n}</span><span class="fi-b"></span><span class="fi-d">${d}</span></span>`;
+}
+
+const EQ = '<span class="eqs"> = </span>';
+const PL = '<span class="pls"> + </span>';
+
+/* ── Calcul principal ── */
+function compute() {
+  const a = parseInt(document.getElementById('a').value) || 2;
+  const b = parseInt(document.getElementById('b').value) || 9;
+  const c = parseInt(document.getElementById('c').value) || 5;
+  const d = parseInt(document.getElementById('d').value) || 12;
+
+  const B = pf(b), D = pf(d);
+  const pgcd = gcd(b, d);
+  const ppcm = lcm(b, d);
+  const k1 = ppcm / b;   // multiplicateur 1ʳᵉ fraction
+  const k2 = ppcm / d;   // multiplicateur 2ᵉ fraction
+  const an1 = a * k1, an2 = c * k2;
+  const ns = an1 + an2;  // numérateur de la somme
+  const gf = gcd(Math.abs(ns), ppcm);
+  const nf = ns / gf, df = ppcm / gf;
+
+  /* ── Décompositions ── */
+  document.getElementById('dcols').innerHTML = `
+    <div class="dbox">
+      <div class="dtitle">Décomposition de b = ${b}</div>
+      ${potence(B.s)}
+      <div class="dresult">${b} = ${B.f.length ? B.f.join(' × ') : b}</div>
+      <div class="dbadges">${mkbadges(B.f, D.f, 'fb')}</div>
+    </div>
+    <div class="dbox">
+      <div class="dtitle">Décomposition de d = ${d}</div>
+      ${potence(D.s)}
+      <div class="dresult">${d} = ${D.f.length ? D.f.join(' × ') : d}</div>
+      <div class="dbadges">${mkbadges(D.f, B.f, 'fd')}</div>
+    </div>`;
+
+  /* ── PGCD / PPCM ── */
+  document.getElementById('pgcdv').textContent = pgcd;
+  document.getElementById('pgcdd').textContent = 'Produit des facteurs communs';
+  document.getElementById('ppcmv').textContent = ppcm;
+  document.getElementById('ppcmd').textContent = `${b} × ${d} ÷ ${pgcd} = ${ppcm}`;
+  document.getElementById('pprow').style.display = 'grid';
+
+  /* ── Étapes de calcul ── */
+  let h = '';
+
+  // Étape 1 : mise au dénominateur commun + numérateurs calculés
+  if (k1 !== 1 || k2 !== 1) {
+    let note = (k1 !== 1 && k2 !== 1)
+      ? `(× ${k1} et × ${k2} pour le PPCM)`
+      : k1 !== 1 ? `(× ${k1} pour la 1ʳᵉ fraction)` : `(× ${k2} pour la 2ᵉ fraction)`;
+    h += `<div class="step">
+      ${fi(a, b)} ${PL} ${fi(c, d)} ${EQ}
+      ${fi(a + ' × ' + k1, b + ' × ' + k1)} ${PL} ${fi(c + ' × ' + k2, d + ' × ' + k2)} ${EQ}
+      ${fi(an1, ppcm)} ${PL} ${fi(an2, ppcm)}
+      <span class="note">${note}</span>
+    </div>`;
+  }
+
+  // Étape 2 : addition des numérateurs
+  const sumStr = an2 >= 0 ? `${an1} + ${an2}` : `${an1} − ${-an2}`;
+  h += `<div class="step">`;
+  if (k1 === 1 && k2 === 1) h += `${fi(a, b)} ${PL} ${fi(c, d)}`;
+  else h += `${fi(an1, ppcm)} ${PL} ${fi(an2, ppcm)}`;
+  h += ` ${EQ} ${fi(sumStr, ppcm)} ${EQ} ${fi(ns, ppcm)}</div>`;
+
+  // Étape 3 : simplification
+  if (ns === 0) {
+    h += `<div class="step">${EQ} <span style="font-size:22px;font-weight:600">0</span></div>`;
+  } else if (gf > 1) {
+    if (df === 1) {
+      h += `<div class="step">${EQ} <span style="font-size:22px;font-weight:600">${nf}</span>
+        <span class="simpbadge">÷ ${gf} — résultat entier</span></div>`;
+    } else {
+      h += `<div class="step">
+        ${EQ} ${fi(ns + ' ÷ ' + gf, ppcm + ' ÷ ' + gf)} ${EQ} ${fi(nf, df)}
+        <span class="simpbadge">PGCD(${Math.abs(ns)}, ${ppcm}) = ${gf}</span>
+      </div>`;
+    }
+  } else {
+    h += `<div class="step">
+      ${fi(ns, ppcm)} <span class="note">est déjà irréductible (PGCD = 1).</span>
+    </div>`;
+  }
+
+  document.getElementById('calcsteps').innerHTML = h;
+  document.getElementById('calcsec').style.display = 'block';
+  document.getElementById('legend').style.display = 'flex';
+  document.getElementById('answer').innerText = '';
+  document.getElementById('answer').focus();
+}
+
+compute();
+</script>
+</body>
+</html>

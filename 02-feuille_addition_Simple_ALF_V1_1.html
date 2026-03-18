@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Addition de fractions - Décomposition</title>
+<style>
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4ef;
+    --color-background-tertiary: #eeede8;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-text-tertiary: #888780;
+    --color-border-primary: rgba(0,0,0,0.4);
+    --color-border-secondary: rgba(0,0,0,0.3);
+    --color-border-tertiary: rgba(0,0,0,0.15);
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --font-sans: system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-background-primary: #1e1e1c;
+      --color-background-secondary: #2a2a27;
+      --color-background-tertiary: #333330;
+      --color-text-primary: #e8e6de;
+      --color-text-secondary: #9c9a92;
+      --color-text-tertiary: #6e6d67;
+      --color-border-primary: rgba(255,255,255,0.4);
+      --color-border-secondary: rgba(255,255,255,0.3);
+      --color-border-tertiary: rgba(255,255,255,0.15);
+    }
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    background: var(--color-background-tertiary);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid var(--color-border-tertiary);
+    padding: 2rem;
+  }
+  .sheet { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  /* ── Saisie ── */
+  .input-row { display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap; margin-bottom: 1rem; }
+  .input-row input {
+    width:75px;text-align:center;font-size:22px;font-weight:500;
+    border:0.5px solid var(--color-border-secondary);border-radius:8px;
+    padding:4px 8px;background:var(--color-background-primary);
+    color:var(--color-text-primary)
+  }
+  .frac-sep { width:90px;height:2px;background:var(--color-text-primary) }
+  .frac-stack { display:flex;flex-direction:column;align-items:center;gap:6px }
+  .operator { font-size: 28px; font-weight: 500; color: var(--color-text-secondary); }
+  
+  .btn {
+    padding:9px 22px;border-radius:8px;
+    border:0.5px solid var(--color-border-secondary);
+    background:var(--color-background-secondary);
+    color:var(--color-text-primary);
+    font-size:15px;font-weight:500;cursor:pointer;
+    margin-left: 20px;
+  }
+  .btn:hover { background:var(--color-background-tertiary) }
+  .btn:active { transform:scale(.97) }
+
+  /* ── Légende ── */
+  .legend {
+    display:flex;gap:14px;flex-wrap:wrap;font-size:14px;
+    color:var(--color-text-secondary);justify-content:center
+  }
+  .ldot {
+    width:14px;height:14px;border-radius:3px;
+    display:inline-block;vertical-align:middle;margin-right:4px
+  }
+
+  /* ── Décompositions ── */
+  .dcols { display:grid;grid-template-columns:1fr 1fr;gap:1rem }
+  .dbox {
+    border:0.5px solid var(--color-border-tertiary);border-radius:10px;
+    padding:.85rem 1rem;background:var(--color-background-primary)
+  }
+  .dtitle {
+    font-size:15px;font-weight:500;color:var(--color-text-secondary);
+    margin-bottom:.75rem;text-align:center
+  }
+  .potence { border-collapse:collapse;margin:0 auto;font-size:17px }
+  .potence td { padding:3px 10px;color:var(--color-text-primary);line-height:1.5 }
+  .potence td.q { text-align:right;min-width:52px;border-right:2px solid var(--color-text-primary) }
+  .potence td.d { padding-left:12px;color:var(--color-text-secondary) }
+  .potence tr:first-child td.d { border-bottom:2px solid var(--color-text-primary) }
+  .potence tr.end td.q { color:var(--color-text-tertiary);font-style:italic }
+  .dresult { margin-top:.65rem;font-size:15px;color:var(--color-text-secondary);text-align:center }
+  .dbadges { margin-top: 1rem; display: flex; align-items: center; justify-content: center; gap: 6px; flex-wrap: wrap; }
+
+  /* ── Lignes de calcul ── */
+  .calc-section {
+    border:0.5px solid var(--color-border-tertiary);border-radius:10px;
+    padding:.9rem 1rem;background:var(--color-background-primary);
+    display: flex; flex-direction: column; gap: 1.5rem;
+  }
+  .calc-step {
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:20px;
+    justify-content: center;
+  }
+  .frac-part { display:flex;flex-direction:column;align-items:center;gap:2px }
+  .frac-num {
+    border-bottom:2px solid var(--color-text-primary);padding-bottom:4px;
+    display:flex;gap:7px;align-items:center;flex-wrap:wrap;
+    justify-content:center;min-height:32px; min-width: 40px;
+  }
+  .frac-den {
+    padding-top:4px;display:flex;gap:7px;align-items:center;
+    flex-wrap:wrap;justify-content:center;min-height:32px; min-width: 40px;
+  }
+  .times { color:var(--color-text-tertiary);font-size:15px }
+  .eq-sign { color:var(--color-text-tertiary);font-size:20px }
+
+  /* ── Badges ── */
+  .fc { background:#FBEAF0;color:#993556;border:1.5px solid #993556;border-radius:6px;padding:2px 9px;font-size:16px;font-weight:700;display:inline-block; }
+  .fb { background:#E6F1FB;color:#185FA5;border:1.5px solid #185FA5;border-radius:6px;padding:2px 9px;font-size:16px;font-weight:700;display:inline-block; }
+  .fd { background:#EAF3DE;color:#3B6D11;border:1.5px solid #3B6D11;border-radius:6px;padding:2px 9px;font-size:16px;font-weight:700;display:inline-block; }
+
+  .divider { border:none;border-top:0.5px solid var(--color-border-tertiary);margin:0 }
+  .empty { text-align:center;color:var(--color-text-tertiary);font-size:14px;padding:.4rem 0 }
+</style>
+</head>
+<body>
+<div class="page">
+<div class="sheet">
+
+  <div class="input-row">
+    <div class="frac-stack">
+      <input type="number" id="n1" value="5" min="1" max="999">
+      <div class="frac-sep"></div>
+      <input type="number" id="d1" value="12" min="2" max="999">
+    </div>
+    <div class="operator">+</div>
+    <div class="frac-stack">
+      <input type="number" id="n2" value="7" min="1" max="999">
+      <div class="frac-sep"></div>
+      <input type="number" id="d2" value="15" min="2" max="999">
+    </div>
+    <button class="btn" onclick="compute()">Calculer ↗</button>
+  </div>
+
+  <div class="legend" id="legend" style="display:none">
+    <span><span class="ldot" style="background:#FBEAF0;border:1.5px solid #993556"></span>Facteurs communs</span>
+    <span><span class="ldot" style="background:#E6F1FB;border:1.5px solid #185FA5"></span>Propre au 1er dén. (b)</span>
+    <span><span class="ldot" style="background:#EAF3DE;border:1.5px solid #3B6D11"></span>Propre au 2e dén. (d)</span>
+  </div>
+
+  <div class="dcols" id="dcols">
+    <div class="dbox"><div class="empty">—</div></div>
+    <div class="dbox"><div class="empty">—</div></div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="calc-section" id="calc-display">
+    <div class="empty">Saisissez les fractions et cliquez sur Calculer.</div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// Génère la décomposition : retourne { s: étapes_potence, f: facteurs_premiers }
+function primeFactors(n) {
+  const s = [], f = [];
+  let div = 2;
+  while (n > 1) {
+    if (n % div === 0) { s.push([n, div]); f.push(div); n = Math.floor(n / div); }
+    else div++;
+  }
+  return { s, f };
+}
+
+// Construit le tableau HTML de la division (la potence)
+function potence(steps) {
+  let html = `<table class="potence">`;
+  steps.forEach(([quot, div], i) => {
+    html += `<tr${i === steps.length - 1 ? ' class="end"' : ''}>
+      <td class="q">${quot}</td><td class="d">${div}</td></tr>`;
+  });
+  html += `<tr class="end"><td class="q">1</td><td class="d"></td></tr></table>`;
+  return html;
+}
+
+// Crée les badges visuels en comparant les facteurs
+function mkbadges(factors, otherFactors, myClass) {
+  const other = [...otherFactors];
+  const t = '<span class="times">×</span>';
+  if (!factors || factors.length === 0) return ''; 
+
+  const badgesHtml = factors.map(f => {
+    const idx = other.indexOf(f);
+    if (idx >= 0) { 
+      other.splice(idx, 1); 
+      return `<span class="fc">${f}</span>`; 
+    }
+    return `<span class="${myClass}">${f}</span>`;
+  });
+  return badgesHtml.join(` ${t} `);
+}
+
+// Fonction principale déclenchée au clic
+function compute() {
+  // Récupération des valeurs a/b + c/d
+  const a = parseInt(document.getElementById('n1').value) || 5;
+  const b = parseInt(document.getElementById('d1').value) || 12;
+  const c = parseInt(document.getElementById('n2').value) || 7;
+  const d = parseInt(document.getElementById('d2').value) || 15;
+
+  const B = primeFactors(b);
+  const D = primeFactors(d);
+
+  // 1. Calcul des facteurs exclusifs à chaque dénominateur
+  let tempD = [...D.f];
+  let onlyB = []; // Facteurs propres à b
+  let common = [];
+  
+  B.f.forEach(fact => {
+    const idx = tempD.indexOf(fact);
+    if (idx >= 0) {
+      common.push(fact);
+      tempD.splice(idx, 1);
+    } else {
+      onlyB.push(fact);
+    }
+  });
+  let onlyD = tempD; // Facteurs propres à d
+
+  // 2. Affichage des blocs de décomposition
+  document.getElementById('dcols').innerHTML = `
+    <div class="dbox">
+      <div class="dtitle">Décomposition de b = ${b}</div>
+      ${potence(B.s)}
+      <div class="dresult">${b} = ${B.f.length ? B.f.join(' × ') : b}</div>
+      <div class="dbadges">${mkbadges(B.f, D.f, 'fb')}</div>
+    </div>
+    <div class="dbox">
+      <div class="dtitle">Décomposition de d = ${d}</div>
+      ${potence(D.s)}
+      <div class="dresult">${d} = ${D.f.length ? D.f.join(' × ') : d}</div>
+      <div class="dbadges">${mkbadges(D.f, B.f, 'fd')}</div>
+    </div>
+  `;
+
+  // 3. Préparation des multiplicateurs pour le calcul
+  const t = '<span class="times">×</span>';
+  
+  // "b" doit être multiplié par les facteurs exclusifs de "d" (onlyD)
+  const multB_badges = onlyD.length ? onlyD.map(f => `<span class="fd">${f}</span>`).join(` ${t} `) : '';
+  const multB_val = onlyD.reduce((acc, val) => acc * val, 1);
+
+  // "d" doit être multiplié par les facteurs exclusifs de "b" (onlyB)
+  const multD_badges = onlyB.length ? onlyB.map(f => `<span class="fb">${f}</span>`).join(` ${t} `) : '';
+  const multD_val = onlyB.reduce((acc, val) => acc * val, 1);
+
+  const ppcm = b * multB_val; 
+
+  // 4. Génération des étapes de calcul
+  let step1 = `
+    <div class="calc-step">
+      <div class="frac-part">
+        <div class="frac-num">${a} ${multB_badges ? t + ' ' + multB_badges : ''}</div>
+        <div class="frac-den">${b} ${multB_badges ? t + ' ' + multB_badges : ''}</div>
+      </div>
+      <span class="operator">+</span>
+      <div class="frac-part">
+        <div class="frac-num">${c} ${multD_badges ? t + ' ' + multD_badges : ''}</div>
+        <div class="frac-den">${d} ${multD_badges ? t + ' ' + multD_badges : ''}</div>
+      </div>
+    </div>`;
+
+  let step2 = `
+    <div class="calc-step">
+      <span class="eq-sign">=</span>
+      <div class="frac-part">
+        <div class="frac-num">${a * multB_val}</div>
+        <div class="frac-den">${ppcm}</div>
+      </div>
+      <span class="operator">+</span>
+      <div class="frac-part">
+        <div class="frac-num">${c * multD_val}</div>
+        <div class="frac-den">${ppcm}</div>
+      </div>
+    </div>`;
+
+  let step3 = `
+    <div class="calc-step">
+      <span class="eq-sign">=</span>
+      <div class="frac-part">
+        <div class="frac-num">${(a * multB_val) + (c * multD_val)}</div>
+        <div class="frac-den">${ppcm}</div>
+      </div>
+    </div>`;
+
+  document.getElementById('calc-display').innerHTML = step1 + step2 + step3;
+  document.getElementById('legend').style.display = 'flex';
+}
+
+// Lancer le calcul initial au chargement
+compute();
+</script>
+</body>
+</html>

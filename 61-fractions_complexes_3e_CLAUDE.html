@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculs fractionnaires — 3ème</title>
+<style>
+:root {
+  --color-background-primary: #ffffff;
+  --color-background-secondary: #f5f4ef;
+  --color-background-tertiary: #eeede8;
+  --color-text-primary: #1a1a18;
+  --color-text-secondary: #5f5e5a;
+  --color-text-tertiary: #888780;
+  --color-border-primary: rgba(0,0,0,0.4);
+  --color-border-secondary: rgba(0,0,0,0.3);
+  --color-border-tertiary: rgba(0,0,0,0.15);
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --font-sans: system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-background-primary: #1e1e1c;
+    --color-background-secondary: #2a2a27;
+    --color-background-tertiary: #333330;
+    --color-text-primary: #e8e6de;
+    --color-text-secondary: #9c9a92;
+    --color-text-tertiary: #6e6d67;
+    --color-border-primary: rgba(255,255,255,0.4);
+    --color-border-secondary: rgba(255,255,255,0.3);
+    --color-border-tertiary: rgba(255,255,255,0.15);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  background: var(--color-background-tertiary);
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+.page {
+  max-width: 880px;
+  margin: 0 auto;
+  background: var(--color-background-primary);
+  border-radius: var(--border-radius-lg);
+  border: 0.5px solid var(--color-border-tertiary);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+.page-title {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  text-align: center;
+}
+
+/* ─── Types grid ─── */
+.types-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+@media (max-width: 800px) { .types-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 480px) { .types-grid { grid-template-columns: repeat(2, 1fr); } }
+.type-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: .6rem .5rem;
+  cursor: pointer;
+  text-align: center;
+  background: var(--color-background-secondary);
+}
+.type-card:hover { background: var(--color-background-tertiary); }
+.type-card.active {
+  background: var(--color-background-primary);
+  border: 1.5px solid #185FA5;
+}
+.tc-num  { font-size: 11px; color: var(--color-text-tertiary); margin-bottom: 3px; }
+.tc-formula { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 3px; line-height: 1.5; }
+.tc-label { font-size: 11px; color: var(--color-text-secondary); }
+
+/* ─── Params ─── */
+.params-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.param-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.param-label { font-size: 12px; color: var(--color-text-secondary); font-style: italic; }
+.param-input {
+  width: 70px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 500;
+  border: 0.5px solid var(--color-border-secondary);
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: var(--color-background-primary);
+  color: var(--color-text-primary);
+}
+.op-toggle { display: flex; gap: 6px; }
+.op-btn {
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: 18px;
+  cursor: pointer;
+}
+.op-btn.active { background: #E6F1FB; border-color: #185FA5; color: #185FA5; }
+.btn {
+  padding: 9px 24px;
+  border-radius: 8px;
+  border: 0.5px solid var(--color-border-secondary);
+  background: var(--color-background-secondary);
+  color: var(--color-text-primary);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+.btn:hover { background: var(--color-background-tertiary); }
+.btn:active { transform: scale(.97); }
+
+/* ─── Fraction rendering ─── */
+.fr {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.1;
+  margin: 0 2px;
+}
+.frn { border-bottom: 1.5px solid var(--color-text-primary); padding: 0 4px 2px; text-align: center; }
+.frd { padding: 2px 4px 0; text-align: center; }
+
+/* ─── Expression box ─── */
+.expr-box {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-lg);
+  padding: 1.25rem 1rem;
+  background: var(--color-background-secondary);
+  text-align: center;
+  font-size: 28px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  line-height: 2.2;
+}
+
+/* ─── Steps ─── */
+.steps-list { display: flex; flex-direction: column; gap: .65rem; }
+.step-card {
+  border: 0.5px solid var(--color-border-tertiary);
+  border-radius: var(--border-radius-md);
+  padding: .75rem 1rem;
+  background: var(--color-background-primary);
+}
+.step-head { display: flex; align-items: center; gap: 10px; margin-bottom: .5rem; }
+.step-num {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--color-background-secondary);
+  border: 0.5px solid var(--color-border-secondary);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 500;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+.step-title { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); }
+.step-body {
+  font-size: 20px;
+  color: var(--color-text-primary);
+  text-align: center;
+  padding: .3rem 0;
+  line-height: 2.4;
+}
+.step-note {
+  font-size: 13px;
+  color: var(--color-text-tertiary);
+  text-align: center;
+  margin-top: .25rem;
+  font-style: italic;
+}
+
+/* ─── Highlight badges ─── */
+.hl-pink  { background:#FBEAF0; color:#993556; border:1.5px solid #993556; border-radius:6px; padding:1px 9px; font-size:18px; font-weight:500; white-space:nowrap; }
+.hl-blue  { background:#E6F1FB; color:#185FA5; border:1.5px solid #185FA5; border-radius:6px; padding:1px 9px; font-size:18px; font-weight:500; white-space:nowrap; }
+.hl-green { background:#EAF3DE; color:#3B6D11; border:1.5px solid #3B6D11; border-radius:6px; padding:1px 9px; font-size:18px; font-weight:500; white-space:nowrap; }
+
+/* ─── Misc ─── */
+.divider { border: none; border-top: 0.5px solid var(--color-border-tertiary); }
+.section-label { font-size: 14px; font-weight: 500; color: var(--color-text-secondary); margin-bottom: .65rem; }
+.placeholder { color: var(--color-text-tertiary); font-size: 14px; }
+.answer-row { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.answer-label { font-size: 15px; font-weight: 500; color: var(--color-text-secondary); }
+.answer-box {
+  border: 2px dashed var(--color-border-secondary);
+  border-radius: 10px;
+  padding: .75rem 1.75rem;
+  min-width: 150px;
+  min-height: 72px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; font-weight: 500;
+  color: var(--color-text-tertiary);
+  cursor: text; outline: none;
+  line-height: 2;
+}
+.answer-box:focus { border-color: var(--color-border-primary); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-title">Calculs fractionnaires — Niveau 3<sup>e</sup></div>
+
+  <!-- Types -->
+  <div>
+    <div class="section-label">Type de calcul</div>
+    <div class="types-grid" id="types-grid"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Params -->
+  <div>
+    <div class="section-label" id="type-desc">—</div>
+    <div class="params-row" id="params-row"></div>
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn" onclick="compute()">Calculer ↗</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Expression -->
+  <div>
+    <div class="section-label">Expression</div>
+    <div class="expr-box" id="expr-box"><span class="placeholder">—</span></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Steps -->
+  <div>
+    <div class="section-label">Étapes de résolution</div>
+    <div id="steps-area">
+      <div style="text-align:center;color:var(--color-text-tertiary);font-size:14px;padding:.75rem">
+        Sélectionnez un type et appuyez sur Calculer.
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Answer -->
+  <div class="answer-row">
+    <div class="answer-label">Résultat :</div>
+    <div class="answer-box" contenteditable="true" spellcheck="false" id="answer"></div>
+  </div>
+
+</div>
+<script>
+// ═══ Math helpers ═══
+function gcd(a, b) {
+  a = Math.abs(a); b = Math.abs(b);
+  while (b) { let t = b; b = a % b; a = t; }
+  return a || 1;
+}
+function lcm(a, b) { return Math.abs(a * b) / gcd(a, b); }
+function simp(n, d) {
+  if (d === 0) return [n, d];
+  if (d < 0) { n = -n; d = -d; }
+  const g = gcd(Math.abs(n), d);
+  return [n / g, d / g];
+}
+
+// ═══ HTML helpers ═══
+function frac(n, d) {
+  if (String(d) === '1') return String(n);
+  return `<span class="fr"><span class="frn">${n}</span><span class="frd">${d}</span></span>`;
+}
+function pw(b, e) {
+  if (e === 0) return '1';
+  if (e === 1) return String(b);
+  if (typeof e === 'number' && e < 0) return frac(1, `${b}<sup>${-e}</sup>`);
+  return `${b}<sup>${e}</sup>`;
+}
+function step(num, title, body, note = '') {
+  return `<div class="step-card">
+    <div class="step-head">
+      <span class="step-num">${num}</span>
+      <span class="step-title">${title}</span>
+    </div>
+    <div class="step-body">${body}</div>
+    ${note ? `<div class="step-note">${note}</div>` : ''}
+  </div>`;
+}
+
+// ═══ Type definitions ═══
+const TYPES = [
+  {
+    id: 1,
+    formula: '1 / (1 + 1/<i>a</i>)',
+    label: 'Fraction composée',
+    desc: 'Simplifier une fraction dont le dénominateur contient lui-même une fraction',
+    params: [{ id:'a', label:'a', val:5 }],
+    hasOp: false
+  },
+  {
+    id: 2,
+    formula: '(<i>a</i>/<i>b</i>)<sup>n</sup>',
+    label: 'Puissance de fraction',
+    desc: 'Appliquer la règle (a/b)ⁿ = aⁿ/bⁿ puis simplifier',
+    params: [
+      { id:'a', label:'a', val:2 },
+      { id:'b', label:'b', val:3 },
+      { id:'n', label:'n', val:3 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 3,
+    formula: '<i>a</i>/<i>b</i> ÷ <i>c</i>/<i>d</i>',
+    label: 'Division de fractions',
+    desc: 'Diviser par une fraction = multiplier par son inverse',
+    params: [
+      { id:'a', label:'a', val:3 },
+      { id:'b', label:'b', val:4 },
+      { id:'c', label:'c', val:9 },
+      { id:'d', label:'d', val:8 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 4,
+    formula: '<i>a</i>/<i>b</i> ± <i>c</i>/<i>d</i>',
+    label: 'Addition / soustraction',
+    desc: 'Trouver le PPCM puis réduire au même dénominateur',
+    params: [
+      { id:'a', label:'a', val:1 },
+      { id:'b', label:'b', val:3 },
+      { id:'c', label:'c', val:1 },
+      { id:'d', label:'d', val:4 }
+    ],
+    hasOp: true
+  },
+  {
+    id: 5,
+    formula: '<i>a</i><sup>n</sup> / <i>a</i><sup>p</sup>',
+    label: 'Puissances — même base',
+    desc: 'Appliquer la règle aⁿ / aᵖ = aⁿ⁻ᵖ (exposants se soustraient)',
+    params: [
+      { id:'a', label:'a', val:3 },
+      { id:'n', label:'n', val:5 },
+      { id:'p', label:'p', val:2 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 6,
+    formula: '(<i>a</i> + <i>b</i>/<i>c</i>) / <i>d</i>',
+    label: 'Entier + fraction / entier',
+    desc: 'Transformer l\'entier en fraction puis diviser le tout par d',
+    params: [
+      { id:'a', label:'a', val:2 },
+      { id:'b', label:'b', val:1 },
+      { id:'c', label:'c', val:3 },
+      { id:'d', label:'d', val:5 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 7,
+    formula: '(<i>a</i><sup>n</sup>/<i>b</i><sup>p</sup>)×(<i>b</i><sup>q</sup>/<i>a</i><sup>m</sup>)',
+    label: 'Produit avec puissances',
+    desc: 'Regrouper les bases identiques puis appliquer aⁿ/aᵖ = aⁿ⁻ᵖ',
+    params: [
+      { id:'a', label:'a', val:2 },
+      { id:'b', label:'b', val:3 },
+      { id:'n', label:'n', val:4 },
+      { id:'p', label:'p', val:2 },
+      { id:'q', label:'q', val:3 },
+      { id:'m', label:'m', val:1 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 8,
+    formula: '1/<i>a</i> + 1/<i>b</i>',
+    label: 'Somme d\'inverses',
+    desc: 'Additionner deux fractions unitaires : 1/a + 1/b = (a+b)/(ab)',
+    params: [
+      { id:'a', label:'a', val:4 },
+      { id:'b', label:'b', val:6 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 9,
+    formula: '(<i>a</i>/<i>b</i>)<sup>−n</sup>',
+    label: 'Puissance négative',
+    desc: 'Appliquer (a/b)⁻ⁿ = (b/a)ⁿ : exposant négatif = on inverse la fraction puis on élève',
+    params: [
+      { id:'a', label:'a', val:2 },
+      { id:'b', label:'b', val:3 },
+      { id:'n', label:'n', val:2 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 10,
+    formula: '<i>a</i>/<i>b</i> × <i>c</i>/<i>d</i> + <i>e</i>/<i>f</i>',
+    label: 'Priorité × avant +',
+    desc: 'Respecter la priorité des opérations : effectuer × en premier, puis additionner',
+    params: [
+      { id:'a', label:'a', val:2 },
+      { id:'b', label:'b', val:3 },
+      { id:'c', label:'c', val:3 },
+      { id:'d', label:'d', val:4 },
+      { id:'e', label:'e', val:1 },
+      { id:'f', label:'f', val:6 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 11,
+    formula: '(<i>a</i>/<i>b</i> ± <i>c</i>/<i>d</i>) × <i>e</i>/<i>f</i>',
+    label: 'Parenthèses puis ×',
+    desc: 'Calculer d\'abord ce qui est entre parenthèses, puis multiplier par la fraction',
+    params: [
+      { id:'a', label:'a', val:1 },
+      { id:'b', label:'b', val:2 },
+      { id:'c', label:'c', val:1 },
+      { id:'d', label:'d', val:3 },
+      { id:'e', label:'e', val:6 },
+      { id:'f', label:'f', val:5 }
+    ],
+    hasOp: true
+  },
+  {
+    id: 12,
+    formula: '√(<i>a</i>² / <i>b</i>²)',
+    label: 'Racine d\'une fraction',
+    desc: 'Appliquer √(a²/b²) = |a|/|b| puis simplifier',
+    params: [
+      { id:'a', label:'a', val:6 },
+      { id:'b', label:'b', val:4 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 13,
+    formula: '<i>a</i><sup>n</sup> × <i>a</i><sup>p</sup>',
+    label: 'Produit — même base',
+    desc: 'Appliquer aⁿ × aᵖ = aⁿ⁺ᵖ : exposants s\'additionnent pour une multiplication',
+    params: [
+      { id:'a', label:'a', val:5 },
+      { id:'n', label:'n', val:3 },
+      { id:'p', label:'p', val:4 }
+    ],
+    hasOp: false
+  },
+  {
+    id: 14,
+    formula: '(<i>a</i>/<i>b</i> − <i>c</i>/<i>d</i>) ÷ <i>e</i>/<i>f</i>',
+    label: 'Soustraction puis ÷',
+    desc: 'Calculer la soustraction entre parenthèses, puis diviser par la fraction',
+    params: [
+      { id:'a', label:'a', val:5 },
+      { id:'b', label:'b', val:6 },
+      { id:'c', label:'c', val:1 },
+      { id:'d', label:'d', val:4 },
+      { id:'e', label:'e', val:7 },
+      { id:'f', label:'f', val:12 }
+    ],
+    hasOp: false
+  }
+];
+
+let curType = 0;
+let curOp = '+';
+
+// ═══ UI rendering ═══
+function renderTypes() {
+  document.getElementById('types-grid').innerHTML = TYPES.map((t, i) =>
+    `<div class="type-card ${i === curType ? 'active' : ''}" onclick="selectType(${i})">
+      <div class="tc-num">Type ${t.id}</div>
+      <div class="tc-formula">${t.formula}</div>
+      <div class="tc-label">${t.label}</div>
+    </div>`
+  ).join('');
+}
+
+function renderParams() {
+  const t = TYPES[curType];
+  document.getElementById('type-desc').innerHTML = t.desc;
+  let html = t.params.map(p =>
+    `<div class="param-group">
+      <div class="param-label">${p.label}</div>
+      <input type="number" class="param-input" id="p_${p.id}" value="${p.val}" min="-999" max="9999">
+    </div>`
+  ).join('');
+  if (t.hasOp) {
+    html += `<div class="param-group">
+      <div class="param-label">opération</div>
+      <div class="op-toggle">
+        <button class="op-btn ${curOp === '+' ? 'active' : ''}" onclick="setOp('+')">+</button>
+        <button class="op-btn ${curOp === '-' ? 'active' : ''}" onclick="setOp('-')">−</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('params-row').innerHTML = html;
+}
+
+function selectType(i) {
+  curType = i;
+  renderTypes();
+  renderParams();
+  document.getElementById('expr-box').innerHTML = '<span class="placeholder">—</span>';
+  document.getElementById('steps-area').innerHTML =
+    '<div style="text-align:center;color:var(--color-text-tertiary);font-size:14px;padding:.75rem">Appuyez sur Calculer.</div>';
+  document.getElementById('answer').innerText = '';
+}
+
+function setOp(op) {
+  curOp = op;
+  renderParams();
+}
+
+function getP(id) {
+  const el = document.getElementById('p_' + id);
+  return el ? (parseInt(el.value) || 0) : 0;
+}
+
+// ═══ Compute functions (one per type) ═══
+
+function computeType1() {
+  const a = getP('a');
+  const [sn, sd] = simp(a, a + 1);
+  return {
+    exprHTML: frac(1, `1 + ${frac(1, a)}`),
+    steps: [
+      step(1, 'Réduire le dénominateur',
+        `1 + ${frac(1, a)} = ${frac('a','a')} + ${frac(1,a)} = ${frac('a + 1','a')}`,
+        `On met 1 sur le dénominateur a : 1 = a/a`
+      ),
+      step(2, 'Inverser la fraction principale',
+        `${frac(1, frac('a+1','a'))} = ${frac('a','a+1')}`,
+        `Diviser par (a+1)/a revient à multiplier par a/(a+1)`
+      ),
+      step(3, 'Substitution et simplification',
+        frac(sn, sd),
+        `PGCD(${a}, ${a+1}) = 1 → fraction irréductible`
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType2() {
+  const a = getP('a'), b = getP('b'), n = getP('n');
+  const an = Math.round(Math.pow(a, n)), bn = Math.round(Math.pow(b, n));
+  const g = gcd(Math.abs(an), Math.abs(bn));
+  const [sn, sd] = simp(an, bn);
+  return {
+    exprHTML: `(${frac(a,b)})<sup>${n}</sup>`,
+    steps: [
+      step(1, 'Règle : (a/b)ⁿ = aⁿ/bⁿ',
+        `(${frac(a,b)})<sup>${n}</sup> = ${frac(pw(a,n), pw(b,n))}`,
+        'On élève séparément numérateur et dénominateur à la puissance n'
+      ),
+      step(2, 'Calculer les puissances',
+        `${frac(pw(a,n), pw(b,n))} = ${frac(an, bn)}`,
+        `${a}<sup>${n}</sup> = ${an} &emsp; ${b}<sup>${n}</sup> = ${bn}`
+      ),
+      step(3, `Simplifier — PGCD(${an}, ${bn}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : `${an} ÷ ${g} = ${sn} &emsp; ${bn} ÷ ${g} = ${sd}`
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType3() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const num = a * d, den = b * c;
+  const g = gcd(Math.abs(num), Math.abs(den));
+  const [sn, sd] = simp(num, den);
+  return {
+    exprHTML: `${frac(a,b)} ÷ ${frac(c,d)}`,
+    steps: [
+      step(1, 'Diviser = multiplier par l\'inverse',
+        `${frac(a,b)} ÷ ${frac(c,d)} = ${frac(a,b)} × ${frac(d,c)}`,
+        'On « retourne » la deuxième fraction'
+      ),
+      step(2, 'Multiplier numérateur × numérateur et dénominateur × dénominateur',
+        `${frac(`${a} × ${d}`, `${b} × ${c}`)} = ${frac(num, den)}`,
+        ''
+      ),
+      step(3, `Simplifier — PGCD(${Math.abs(num)}, ${Math.abs(den)}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType4() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const L = lcm(Math.abs(b), Math.abs(d));
+  const kA = L / Math.abs(b), kC = L / Math.abs(d);
+  const numA = a * kA, numC = c * kC;
+  const numRes = curOp === '+' ? numA + numC : numA - numC;
+  const g = gcd(Math.abs(numRes), L);
+  const [sn, sd] = simp(numRes, L);
+  const opChar = curOp === '+' ? '+' : '−';
+  return {
+    exprHTML: `${frac(a,b)} ${opChar} ${frac(c,d)}`,
+    steps: [
+      step(1, 'Trouver le PPCM des dénominateurs',
+        `PPCM(${Math.abs(b)}, ${Math.abs(d)}) = <span class="hl-pink">${L}</span>`,
+        `Le dénominateur commun sera ${L}`
+      ),
+      step(2, 'Convertir les deux fractions',
+        `${frac(a,b)} = ${frac(`${a} × ${kA}`, L)} = ${frac(numA, L)}
+         &emsp; ${frac(c,d)} = ${frac(`${c} × ${kC}`, L)} = ${frac(numC, L)}`,
+        ''
+      ),
+      step(3, `${curOp === '+' ? 'Additionner' : 'Soustraire'} les numérateurs`,
+        `${frac(`${numA} ${opChar} ${numC}`, L)} = ${frac(numRes, L)}`,
+        ''
+      ),
+      step(4, `Simplifier — PGCD(${Math.abs(numRes)}, ${L}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType5() {
+  const a = getP('a'), n = getP('n'), p = getP('p');
+  const diff = n - p;
+  const resultHTML = diff > 0 ? pw(a, diff) : diff < 0 ? frac(1, pw(a, -diff)) : '1';
+  return {
+    exprHTML: `${pw(a,n)} / ${pw(a,p)}`,
+    steps: [
+      step(1, 'Rappel de la règle',
+        `${pw('a','n')} / ${pw('a','p')} = ${pw('a','n − p')}`,
+        'Pour diviser des puissances de même base, on soustrait les exposants'
+      ),
+      step(2, 'Calculer l\'exposant',
+        `n − p = ${n} − ${p} = <span class="hl-blue">${diff}</span>`,
+        diff < 0 ? 'Exposant négatif → la puissance passe au dénominateur' :
+        diff === 0 ? 'Exposant nul → tout nombre ≠ 0 élevé à 0 vaut 1' : ''
+      ),
+      step(3, 'Résultat final',
+        resultHTML,
+        diff < 0 ? `${pw(a, diff)} s'écrit ${frac(1, pw(a, -diff))}` : ''
+      )
+    ],
+    result: resultHTML
+  };
+}
+
+function computeType6() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const numTop = a * c + b;
+  const denFin = c * d;
+  const g = gcd(Math.abs(numTop), Math.abs(denFin));
+  const [sn, sd] = simp(numTop, denFin);
+  return {
+    exprHTML: frac(`${a} + ${frac(b,c)}`, d),
+    steps: [
+      step(1, `Transformer ${a} en fraction de dénominateur ${c}`,
+        `${a} + ${frac(b,c)} = ${frac(`${a} × ${c}`,c)} + ${frac(b,c)} = ${frac(`${a*c} + ${b}`,c)} = ${frac(numTop,c)}`,
+        `${a} = ${frac(a*c, c)}`
+      ),
+      step(2, `Diviser par ${d}`,
+        `${frac(numTop,c)} ÷ ${d} = ${frac(numTop, `${c} × ${d}`)} = ${frac(numTop, denFin)}`,
+        `Diviser par ${d} revient à multiplier le dénominateur par ${d}`
+      ),
+      step(3, `Simplifier — PGCD(${numTop}, ${denFin}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType7() {
+  const a = getP('a'), b = getP('b');
+  const n = getP('n'), p = getP('p'), q = getP('q'), m = getP('m');
+  const eA = n - m, eB = q - p;
+
+  const numParts = [], denParts = [];
+  if (eA > 0) numParts.push(pw(a, eA)); else if (eA < 0) denParts.push(pw(a, -eA));
+  if (eB > 0) numParts.push(pw(b, eB)); else if (eB < 0) denParts.push(pw(b, -eB));
+  const numStr = numParts.length ? numParts.join(' × ') : '1';
+  const denStr = denParts.length ? denParts.join(' × ') : '1';
+
+  const numVal = (eA > 0 ? Math.pow(a,eA) : 1) * (eB > 0 ? Math.pow(b,eB) : 1);
+  const denVal = (eA < 0 ? Math.pow(a,-eA) : 1) * (eB < 0 ? Math.pow(b,-eB) : 1);
+
+  return {
+    exprHTML: `${frac(pw(a,n), pw(b,p))} × ${frac(pw(b,q), pw(a,m))}`,
+    steps: [
+      step(1, 'Regrouper les mêmes bases',
+        frac(`${pw(a,n)} × ${pw(b,q)}`, `${pw(b,p)} × ${pw(a,m)}`),
+        'On réorganise en mettant les a ensemble et les b ensemble'
+      ),
+      step(2, 'Appliquer aⁿ/aᵖ = aⁿ⁻ᵖ pour chaque base',
+        `${pw(a,n)}/${pw(a,m)} = ${pw(a,`${n}−${m}`)} = <span class="hl-blue">${pw(a, eA)}</span>
+         &emsp; 
+         ${pw(b,q)}/${pw(b,p)} = ${pw(b,`${q}−${p}`)} = <span class="hl-green">${pw(b, eB)}</span>`,
+        ''
+      ),
+      step(3, 'Résultat final',
+        frac(numStr, denStr),
+        `Valeur numérique : ${frac(Math.round(numVal), Math.round(denVal))}`
+      )
+    ],
+    result: frac(numStr, denStr)
+  };
+}
+
+function computeType8() {
+  const a = getP('a'), b = getP('b');
+  const num = a + b, den = a * b;
+  const g = gcd(Math.abs(num), Math.abs(den));
+  const [sn, sd] = simp(num, den);
+  return {
+    exprHTML: `${frac(1,a)} + ${frac(1,b)}`,
+    steps: [
+      step(1, 'Formule directe : 1/a + 1/b = (a+b)/(a×b)',
+        `${frac(1,'a')} + ${frac(1,'b')} = ${frac('a + b','a × b')}`,
+        'Règle dérivée de la mise au même dénominateur avec PPCM = a×b'
+      ),
+      step(2, 'Substituer les valeurs',
+        `${frac(`${a} + ${b}`, `${a} × ${b}`)} = ${frac(num, den)}`,
+        ''
+      ),
+      step(3, `Simplifier — PGCD(${num}, ${den}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType9() {
+  const a = getP('a'), b = getP('b'), n = getP('n');
+  const bn = Math.round(Math.pow(b, n)), an = Math.round(Math.pow(a, n));
+  const [sn, sd] = simp(bn, an);
+  return {
+    exprHTML: `(${frac(a,b)})<sup>−${n}</sup>`,
+    steps: [
+      step(1, 'Règle : (a/b)⁻ⁿ = (b/a)ⁿ',
+        `(${frac(a,b)})<sup>−${n}</sup> = (${frac(b,a)})<sup>${n}</sup>`,
+        'Exposant négatif → on inverse la fraction, l\'exposant devient positif'
+      ),
+      step(2, 'Appliquer (b/a)ⁿ = bⁿ/aⁿ',
+        `(${frac(b,a)})<sup>${n}</sup> = ${frac(pw(b,n), pw(a,n))} = ${frac(bn, an)}`,
+        `${b}<sup>${n}</sup> = ${bn} &emsp; ${a}<sup>${n}</sup> = ${an}`
+      ),
+      step(3, `Simplifier — PGCD(${bn}, ${an}) = ${gcd(bn,an)}`,
+        frac(sn, sd),
+        gcd(bn,an) === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType10() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const e = getP('e'), f = getP('f');
+  const pn = a * c, pd = b * d;
+  const [pSn, pSd] = simp(pn, pd);
+  const L = lcm(pSd, Math.abs(f));
+  const k1 = L / pSd, k2 = L / Math.abs(f);
+  const numFin = pSn * k1 + e * k2;
+  const [sn, sd] = simp(numFin, L);
+  return {
+    exprHTML: `${frac(a,b)} × ${frac(c,d)} + ${frac(e,f)}`,
+    steps: [
+      step(1, 'Priorité : effectuer × en premier',
+        `${frac(a,b)} × ${frac(c,d)} = ${frac(`${a}×${c}`,`${b}×${d}`)} = ${frac(pn,pd)}`,
+        'La multiplication est prioritaire sur l\'addition'
+      ),
+      step(2, 'Simplifier le produit',
+        frac(pSn, pSd),
+        `PGCD(${Math.abs(pn)}, ${pd}) = ${gcd(Math.abs(pn),pd)}`
+      ),
+      step(3, `Additionner — PPCM(${pSd}, ${Math.abs(f)}) = ${L}`,
+        `${frac(pSn,pSd)} + ${frac(e,f)} = ${frac(`${pSn*k1} + ${e*k2}`, L)} = ${frac(numFin,L)}`,
+        ''
+      ),
+      step(4, 'Simplifier le résultat',
+        frac(sn, sd),
+        gcd(Math.abs(numFin),L) === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType11() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const e = getP('e'), f = getP('f');
+  const opChar = curOp === '+' ? '+' : '−';
+  const L = lcm(Math.abs(b), Math.abs(d));
+  const k1 = L / Math.abs(b), k2 = L / Math.abs(d);
+  const numA = a * k1, numC = c * k2;
+  const sumNum = curOp === '+' ? numA + numC : numA - numC;
+  const [sSn, sSd] = simp(sumNum, L);
+  const prodN = sSn * e, prodD = sSd * f;
+  const [sn, sd] = simp(prodN, prodD);
+  return {
+    exprHTML: `(${frac(a,b)} ${opChar} ${frac(c,d)}) × ${frac(e,f)}`,
+    steps: [
+      step(1, `Calculer les parenthèses — PPCM(${Math.abs(b)}, ${Math.abs(d)}) = ${L}`,
+        `${frac(a,b)} ${opChar} ${frac(c,d)} = ${frac(`${numA} ${opChar} ${numC}`, L)} = ${frac(sumNum,L)}`,
+        'On traite d\'abord ce qui est entre parenthèses'
+      ),
+      step(2, 'Simplifier la somme',
+        frac(sSn, sSd),
+        `PGCD(${Math.abs(sumNum)}, ${L}) = ${gcd(Math.abs(sumNum), L)}`
+      ),
+      step(3, 'Multiplier par e/f',
+        `${frac(sSn,sSd)} × ${frac(e,f)} = ${frac(`${sSn}×${e}`,`${sSd}×${f}`)} = ${frac(prodN,prodD)}`,
+        ''
+      ),
+      step(4, 'Simplifier le résultat',
+        frac(sn, sd),
+        gcd(Math.abs(prodN),Math.abs(prodD)) === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType12() {
+  const a = Math.abs(getP('a')), b = Math.abs(getP('b'));
+  const g = gcd(a, b);
+  const [sn, sd] = simp(a, b);
+  return {
+    exprHTML: `√(${frac(`${a}<sup>2</sup>`, `${b}<sup>2</sup>`)})`,
+    steps: [
+      step(1, 'Règle : √(a²/b²) = |a|/|b|',
+        `√(${frac(`${a}<sup>2</sup>`, `${b}<sup>2</sup>`)}) = ${frac(`√(${a}<sup>2</sup>)`, `√(${b}<sup>2</sup>)`)}`,
+        'La racine s\'applique séparément au numérateur et au dénominateur'
+      ),
+      step(2, 'Calculer les racines',
+        `${frac(`√(${a}<sup>2</sup>)`, `√(${b}<sup>2</sup>)`)} = ${frac(a, b)}`,
+        `√(${a}²) = ${a} &emsp; √(${b}²) = ${b} &emsp; (valeurs absolues)`
+      ),
+      step(3, `Simplifier — PGCD(${a}, ${b}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : `${a} ÷ ${g} = ${sn} &emsp; ${b} ÷ ${g} = ${sd}`
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+function computeType13() {
+  const a = getP('a'), n = getP('n'), p = getP('p');
+  const sum = n + p;
+  const resultHTML = sum > 0 ? pw(a, sum) : sum < 0 ? frac(1, pw(a, -sum)) : '1';
+  return {
+    exprHTML: `${pw(a,n)} × ${pw(a,p)}`,
+    steps: [
+      step(1, 'Rappel de la règle',
+        `${pw('a','n')} × ${pw('a','p')} = ${pw('a','n + p')}`,
+        'Pour multiplier des puissances de même base, on additionne les exposants'
+      ),
+      step(2, 'Calculer l\'exposant',
+        `n + p = ${n} + ${p} = <span class="hl-blue">${sum}</span>`,
+        sum < 0 ? 'Exposant négatif → la puissance passe au dénominateur' :
+        sum === 0 ? 'Exposant nul → tout nombre ≠ 0 élevé à 0 vaut 1' : ''
+      ),
+      step(3, 'Résultat final',
+        resultHTML,
+        sum < 0 ? `${pw(a,sum)} s'écrit ${frac(1, pw(a,-sum))}` : ''
+      )
+    ],
+    result: resultHTML
+  };
+}
+
+function computeType14() {
+  const a = getP('a'), b = getP('b'), c = getP('c'), d = getP('d');
+  const e = getP('e'), f = getP('f');
+  const L = lcm(Math.abs(b), Math.abs(d));
+  const k1 = L / Math.abs(b), k2 = L / Math.abs(d);
+  const diffNum = a * k1 - c * k2;
+  const [dSn, dSd] = simp(diffNum, L);
+  const prodN = dSn * f, prodD = dSd * e;
+  const g = gcd(Math.abs(prodN), Math.abs(prodD));
+  const [sn, sd] = simp(prodN, prodD);
+  return {
+    exprHTML: `(${frac(a,b)} − ${frac(c,d)}) ÷ ${frac(e,f)}`,
+    steps: [
+      step(1, `Soustraire — PPCM(${Math.abs(b)}, ${Math.abs(d)}) = ${L}`,
+        `${frac(a,b)} − ${frac(c,d)} = ${frac(`${a*k1} − ${c*k2}`, L)} = ${frac(diffNum,L)}`,
+        'On traite d\'abord ce qui est entre parenthèses'
+      ),
+      step(2, 'Simplifier la différence',
+        frac(dSn, dSd),
+        `PGCD(${Math.abs(diffNum)}, ${L}) = ${gcd(Math.abs(diffNum), L)}`
+      ),
+      step(3, 'Diviser par e/f = multiplier par f/e',
+        `${frac(dSn,dSd)} × ${frac(f,e)} = ${frac(`${dSn}×${f}`,`${dSd}×${e}`)} = ${frac(prodN,prodD)}`,
+        'Diviser par une fraction revient à multiplier par son inverse'
+      ),
+      step(4, `Simplifier — PGCD(${Math.abs(prodN)}, ${Math.abs(prodD)}) = ${g}`,
+        frac(sn, sd),
+        g === 1 ? 'Fraction irréductible' : ''
+      )
+    ],
+    result: frac(sn, sd)
+  };
+}
+
+const COMPUTE_FNS = [
+  computeType1, computeType2, computeType3, computeType4,
+  computeType5, computeType6, computeType7, computeType8,
+  computeType9, computeType10, computeType11, computeType12,
+  computeType13, computeType14
+];
+
+function compute() {
+  try {
+    const { exprHTML, steps, result } = COMPUTE_FNS[curType]();
+    document.getElementById('expr-box').innerHTML = exprHTML;
+    document.getElementById('steps-area').innerHTML =
+      `<div class="steps-list">${steps.join('')}</div>`;
+    document.getElementById('answer').innerText = '';
+    document.getElementById('answer').focus();
+  } catch(e) {
+    document.getElementById('steps-area').innerHTML =
+      `<div style="text-align:center;color:#993556;font-size:14px;padding:.75rem">
+        Erreur de calcul — vérifiez les valeurs saisies.
+      </div>`;
+  }
+}
+
+// ═══ Init ═══
+renderTypes();
+renderParams();
+</script>
+</body>
+</html>

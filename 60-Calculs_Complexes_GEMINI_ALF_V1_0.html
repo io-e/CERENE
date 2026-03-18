@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculs Complexes - Niveau 3ème</title>
+<style>
+  :root {
+    --color-bg: #f5f4ef;
+    --color-card: #ffffff;
+    --color-text: #1a1a18;
+    --color-text-mut: #5f5e5a;
+    --color-border: rgba(0,0,0,0.15);
+    --color-accent: #185FA5;
+    --color-accent-bg: #E6F1FB;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: system-ui, sans-serif;
+    background: var(--color-bg);
+    color: var(--color-text);
+    padding: 2rem 1rem;
+    line-height: 1.5;
+  }
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--color-card);
+    border-radius: 12px;
+    border: 1px solid var(--color-border);
+    padding: 2rem;
+  }
+  h1 { text-align: center; font-size: 1.5rem; margin-bottom: 1.5rem; }
+  
+  .form-group { margin-bottom: 1.5rem; }
+  label { display: block; font-weight: 600; margin-bottom: 0.5rem; }
+  select {
+    width: 100%; padding: 0.75rem; border-radius: 8px;
+    border: 1px solid var(--color-border); font-size: 1rem;
+    background: var(--color-bg); cursor: pointer;
+  }
+  
+  .variables-grid {
+    display: flex; flex-wrap: wrap; gap: 15px;
+    background: var(--color-bg); padding: 1rem; border-radius: 8px;
+    justify-content: center; align-items: center;
+  }
+  .var-input { display: flex; align-items: center; gap: 8px; }
+  .var-input span { font-weight: bold; font-family: serif; font-size: 1.2rem; font-style: italic; }
+  .var-input input {
+    width: 60px; padding: 6px; text-align: center; font-size: 1.1rem;
+    border: 1px solid var(--color-border); border-radius: 6px;
+  }
+
+  .btn {
+    display: block; width: 100%; padding: 1rem; margin-top: 1.5rem;
+    background: var(--color-accent-bg); color: var(--color-accent);
+    border: 1px solid var(--color-accent); border-radius: 8px;
+    font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.2s;
+  }
+  .btn:hover { background: #d0e4f7; }
+
+  .result-box {
+    margin-top: 2rem; padding: 1.5rem; border-radius: 8px;
+    border: 1px dashed var(--color-border); text-align: center;
+  }
+  
+  /* Rendu mathématique simple en HTML */
+  .math-expr { display: inline-flex; align-items: center; gap: 8px; font-size: 1.3rem; }
+  .frac { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 4px; }
+  .frac-num { border-bottom: 2px solid var(--color-text); padding: 0 4px 2px 4px; min-width: 20px; text-align: center; }
+  .frac-den { padding: 2px 4px 0 4px; min-width: 20px; text-align: center; }
+  .big-parens { font-size: 2.5rem; font-weight: 300; line-height: 0.5; vertical-align: middle; }
+  .power { font-size: 0.8rem; vertical-align: super; margin-left: 2px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Calculateur de Fractions - Niveau 3ème</h1>
+  
+  <div class="form-group">
+    <label for="typeSelect">Choisissez le type de calcul :</label>
+    <select id="typeSelect" onchange="updateInputs()">
+      <option value="type1">Type 1 : 1 / (1 + 1/a)</option>
+      <option value="type2">Type 2 : (1 / aⁿ) / bᵖ</option>
+      <option value="type3">Type 3 : (a/b) / (c/d)</option>
+      <option value="type4">Type 4 : a/b + c/d × e/f</option>
+      <option value="type5">Type 5 : (a/b)ⁿ × (c/d)</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Saisissez les valeurs (nombres entiers) :</label>
+    <div class="variables-grid" id="varsContainer">
+      </div>
+  </div>
+
+  <button class="btn" onclick="compute()">Calculer le résultat exact</button>
+
+  <div class="result-box" id="resultBox">
+    Sélectionnez une formule et entrez des valeurs.
+  </div>
+</div>
+
+<script>
+// --- MOTEUR DE CALCUL DE FRACTIONS EXACTES ---
+const gcd = (a, b) => b === 0 ? Math.abs(a) : gcd(b, a % b);
+
+function simplify(n, d) {
+  if (d === 0) throw new Error("Division par zéro");
+  let sign = (n * d < 0) ? -1 : 1;
+  let num = Math.abs(n), den = Math.abs(d);
+  let g = gcd(num, den);
+  return { n: sign * (num / g), d: den / g };
+}
+
+const add = (f1, f2) => simplify(f1.n * f2.d + f2.n * f1.d, f1.d * f2.d);
+const mul = (f1, f2) => simplify(f1.n * f2.n, f1.d * f2.d);
+const div = (f1, f2) => simplify(f1.n * f2.d, f1.d * f2.n);
+const pow = (f, p) => simplify(Math.pow(f.n, p), Math.pow(f.d, p));
+
+// Rendu HTML d'une fraction
+function renderFrac(num, den) {
+  if (den === 1) return `<span>${num}</span>`;
+  let sign = num < 0 ? "-" : "";
+  return `<span class="math-expr">${sign}<div class="frac"><div class="frac-num">${Math.abs(num)}</div><div class="frac-den">${den}</div></div></span>`;
+}
+
+// --- LOGIQUE DE L'INTERFACE ---
+const config = {
+  type1: { vars: ['a'], formulaRender: (v) => renderFrac(1, `1 + ${renderFrac(1, v.a)}`) },
+  type2: { vars: ['a', 'n', 'b', 'p'], formulaRender: (v) => renderFrac(renderFrac(1, `${v.a}<span class="power">${v.n}</span>`), `${v.b}<span class="power">${v.p}</span>`) },
+  type3: { vars: ['a', 'b', 'c', 'd'], formulaRender: (v) => renderFrac(renderFrac(v.a, v.b), renderFrac(v.c, v.d)) },
+  type4: { vars: ['a', 'b', 'c', 'd', 'e', 'f'], formulaRender: (v) => `<span class="math-expr">${renderFrac(v.a, v.b)} + ${renderFrac(v.c, v.d)} × ${renderFrac(v.e, v.f)}</span>` },
+  type5: { vars: ['a', 'b', 'n', 'c', 'd'], formulaRender: (v) => `<span class="math-expr"><span class="big-parens">(</span>${renderFrac(v.a, v.b)}<span class="big-parens">)</span><span class="power">${v.n}</span> × ${renderFrac(v.c, v.d)}</span>` }
+};
+
+function updateInputs() {
+  const type = document.getElementById('typeSelect').value;
+  const vars = config[type].vars;
+  const container = document.getElementById('varsContainer');
+  
+  container.innerHTML = vars.map(v => `
+    <div class="var-input">
+      <span>${v}</span> = <input type="number" id="val_${v}" value="2" onchange="compute()">
+    </div>
+  `).join('');
+  
+  // Mettre des valeurs par défaut un peu différentes pour éviter que tout soit 2
+  if(document.getElementById('val_b')) document.getElementById('val_b').value = 3;
+  if(document.getElementById('val_c')) document.getElementById('val_c').value = 5;
+  if(document.getElementById('val_d')) document.getElementById('val_d').value = 4;
+  
+  compute();
+}
+
+function compute() {
+  try {
+    const type = document.getElementById('typeSelect').value;
+    const vars = {};
+    config[type].vars.forEach(v => {
+      vars[v] = parseInt(document.getElementById(`val_${v}`).value) || 0;
+    });
+
+    let res;
+    // Moteur de résolution selon le type
+    if (type === 'type1') {
+      // 1 / (1 + 1/a)
+      let one = {n: 1, d: 1};
+      let fracA = simplify(1, vars.a);
+      let sum = add(one, fracA);
+      res = div(one, sum);
+    } 
+    else if (type === 'type2') {
+      // (1 / a^n) / b^p
+      let top = simplify(1, Math.pow(vars.a, vars.n));
+      let bot = simplify(Math.pow(vars.b, vars.p), 1);
+      res = div(top, bot);
+    }
+    else if (type === 'type3') {
+      // (a/b) / (c/d)
+      res = div(simplify(vars.a, vars.b), simplify(vars.c, vars.d));
+    }
+    else if (type === 'type4') {
+      // a/b + (c/d * e/f)
+      let term1 = simplify(vars.a, vars.b);
+      let term2 = mul(simplify(vars.c, vars.d), simplify(vars.e, vars.f));
+      res = add(term1, term2);
+    }
+    else if (type === 'type5') {
+      // (a/b)^n * (c/d)
+      let term1 = pow(simplify(vars.a, vars.b), vars.n);
+      let term2 = simplify(vars.c, vars.d);
+      res = mul(term1, term2);
+    }
+
+    // Affichage
+    const initialMath = config[type].formulaRender(vars);
+    const resultMath = renderFrac(res.n, res.d);
+    
+    document.getElementById('resultBox').innerHTML = `
+      <div style="margin-bottom: 1rem; color: #5f5e5a;">Expression calculée :</div>
+      <div class="math-expr">${initialMath} = <strong>${resultMath}</strong></div>
+    `;
+
+  } catch (e) {
+    document.getElementById('resultBox').innerHTML = `<span style="color: red;">Erreur : ${e.message}. Vérifiez vos nombres (ex: pas de division par zéro).</span>`;
+  }
+}
+
+// Init
+window.onload = updateInputs;
+</script>
+</body>
+</html>

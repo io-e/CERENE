@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fractions Visuelles : Le Dénominateur Commun</title>
+<style>
+  :root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #f5f4ef;
+    --color-bg-tertiary: #eeede8;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-text-tertiary: #888780;
+    --color-border: rgba(0,0,0,0.15);
+    
+    --color-f1: #185FA5; /* Bleu */
+    --color-f1-light: #E6F1FB;
+    --color-f2: #3B6D11; /* Vert */
+    --color-f2-light: #EAF3DE;
+    --color-locked: #993556; /* Rouge */
+    --color-locked-light: #FBEAF0;
+    
+    --font-sans: system-ui, sans-serif;
+  }
+  
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    padding: 2rem 1rem;
+    min-height: 100vh;
+  }
+  .page {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: var(--color-bg-primary);
+    border-radius: 12px;
+    border: 0.5px solid var(--color-border);
+    padding: 2rem;
+  }
+  
+  /* Saisie Supérieure */
+  .header-inputs {
+    display: flex; justify-content: center; align-items: center; gap: 2rem;
+    margin-bottom: 2rem; flex-wrap: wrap;
+  }
+  .frac-input { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+  .frac-input input {
+    width: 60px; text-align: center; font-size: 22px; font-weight: bold;
+    border: 1px solid var(--color-border); border-radius: 6px; padding: 4px;
+  }
+  .f1-input input { color: var(--color-f1); background: var(--color-f1-light); border-color: var(--color-f1); }
+  .f2-input input { color: var(--color-f2); background: var(--color-f2-light); border-color: var(--color-f2); }
+  .frac-bar { width: 70px; height: 3px; background: var(--color-text-primary); }
+  .operator { font-size: 32px; font-weight: bold; }
+
+  /* Grille des 3 colonnes */
+  .visual-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem;
+    align-items: stretch;
+  }
+  @media (max-width: 800px) {
+    .visual-grid { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    border: 1px solid var(--color-border); border-radius: 10px;
+    padding: 1.5rem 1rem; display: flex; flex-direction: column; align-items: center;
+    background: var(--color-bg-secondary); text-align: center;
+  }
+  .panel-title { font-weight: 600; margin-bottom: 1rem; font-size: 18px; }
+
+  /* Contrôles de redécoupage */
+  .controls { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+  .btn-cut {
+    background: #fff; border: 1px solid var(--color-border); border-radius: 6px;
+    padding: 5px 12px; font-size: 16px; cursor: pointer; font-weight: bold;
+  }
+  .btn-cut:hover { background: #eee; }
+  .btn-cut:active { transform: scale(0.95); }
+  
+  /* Textes mathématiques */
+  .math-text { font-size: 20px; font-weight: 500; margin-bottom: 15px; min-height: 30px;}
+  .highlight { padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+  .hl-f1 { background: var(--color-f1-light); color: var(--color-f1); }
+  .hl-f2 { background: var(--color-f2-light); color: var(--color-f2); }
+
+  /* SVG Containers */
+  .svg-container { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+  .pie-svg { width: 160px; height: 160px; overflow: visible; }
+  .line-svg { width: 100%; max-width: 250px; height: 60px; overflow: visible; }
+
+  /* Cadenas (Résultat bloqué) */
+  .locked-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 100%; color: var(--color-locked); gap: 15px;
+  }
+  .locked-icon { font-size: 48px; }
+  .locked-text { font-weight: 600; font-size: 18px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header-inputs">
+    <div class="frac-input f1-input">
+      <input type="number" id="n1" value="1" min="0" oninput="resetM()">
+      <div class="frac-bar"></div>
+      <input type="number" id="d1" value="3" min="1" oninput="resetM()">
+    </div>
+    <div class="operator">+</div>
+    <div class="frac-input f2-input">
+      <input type="number" id="n2" value="1" min="0" oninput="resetM()">
+      <div class="frac-bar"></div>
+      <input type="number" id="d2" value="4" min="1" oninput="resetM()">
+    </div>
+  </div>
+
+  <div class="visual-grid">
+    <div class="panel">
+      <div class="panel-title" style="color: var(--color-f1);">Fraction Bleue</div>
+      <div class="controls">
+        <button class="btn-cut" onclick="changeM(1, -1)">− Réduire</button>
+        <button class="btn-cut" onclick="changeM(1, 1)">+ Redécouper</button>
+      </div>
+      <div class="math-text" id="math1"></div>
+      <div class="svg-container" id="svg1"></div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title" style="color: var(--color-f2);">Fraction Verte</div>
+      <div class="controls">
+        <button class="btn-cut" onclick="changeM(2, -1)">− Réduire</button>
+        <button class="btn-cut" onclick="changeM(2, 1)">+ Redécouper</button>
+      </div>
+      <div class="math-text" id="math2"></div>
+      <div class="svg-container" id="svg2"></div>
+    </div>
+
+    <div class="panel" id="result-panel">
+      </div>
+  </div>
+</div>
+
+<script>
+// État des multiplicateurs (combien de fois on coupe les parts)
+let m1 = 1;
+let m2 = 1;
+
+// Couleurs
+const C_F1 = "#185FA5";
+const C_F2 = "#3B6D11";
+const C_EMPTY = "#e0e0e0";
+
+// Met à jour les valeurs quand on clique sur "Redécouper"
+function changeM(fracId, delta) {
+  if (fracId === 1) { m1 = Math.max(1, m1 + delta); }
+  if (fracId === 2) { m2 = Math.max(1, m2 + delta); }
+  render();
+}
+
+// Réinitialise les coupes si l'utilisateur change les fractions de base
+function resetM() {
+  m1 = 1; m2 = 1;
+  render();
+}
+
+// Fonction pour dessiner un camembert (SVG)
+function drawPie(numerator, denominator, color1, color2 = null, num2 = 0) {
+  let svg = `<svg class="pie-svg" viewBox="-1 -1 2 2" transform="rotate(-90)">`;
+  
+  if (denominator === 1 || numerator >= denominator) {
+    // Si la fraction est entière ou dépasse 1, on remplit tout
+    svg += `<circle cx="0" cy="0" r="1" fill="${color1}" />`;
+    if (color2 && num2 > 0) {
+      // Cas très rare ici, géré simplement pour éviter les bugs
+    }
+  } else {
+    // On dessine chaque part
+    for (let i = 0; i < denominator; i++) {
+      let startAngle = (i / denominator) * Math.PI * 2;
+      let endAngle = ((i + 1) / denominator) * Math.PI * 2;
+      
+      let x1 = Math.cos(startAngle); let y1 = Math.sin(startAngle);
+      let x2 = Math.cos(endAngle);   let y2 = Math.sin(endAngle);
+      
+      let fill = C_EMPTY; // Couleur vide
+      if (i < numerator) { fill = color1; } 
+      else if (color2 && i < numerator + num2) { fill = color2; }
+
+      // Trace un arc de cercle (path)
+      let largeArcFlag = (1 / denominator) > 0.5 ? 1 : 0;
+      svg += `<path d="M 0 0 L ${x1} ${y1} A 1 1 0 ${largeArcFlag} 1 ${x2} ${y2} Z" fill="${fill}" stroke="#fff" stroke-width="0.02"/>`;
+    }
+  }
+  svg += `</svg>`;
+  return svg;
+}
+
+// Fonction pour dessiner une ligne graduée (SVG)
+function drawLine(numerator, denominator, color1, color2 = null, num2 = 0) {
+  const w = 260; const h = 40; const pad = 10;
+  const lineW = w - 2 * pad;
+  
+  let svg = `<svg class="line-svg" viewBox="0 0 ${w} ${h}">`;
+  
+  // Ligne de base
+  svg += `<line x1="${pad}" y1="20" x2="${pad + lineW}" y2="20" stroke="#aaa" stroke-width="4" stroke-linecap="round"/>`;
+  
+  // Graduations
+  for (let i = 0; i <= denominator; i++) {
+    let x = pad + (i / denominator) * lineW;
+    svg += `<line x1="${x}" y1="12" x2="${x}" y2="28" stroke="#666" stroke-width="2"/>`;
+  }
+  
+  // Barre colorée 1
+  if (numerator > 0) {
+    let w1 = (Math.min(numerator, denominator) / denominator) * lineW;
+    svg += `<line x1="${pad}" y1="20" x2="${pad + w1}" y2="20" stroke="${color1}" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  
+  // Barre colorée 2 (Pour le résultat combiné)
+  if (color2 && num2 > 0) {
+    let startX = pad + (numerator / denominator) * lineW;
+    let w2 = (Math.min(num2, denominator - numerator) / denominator) * lineW;
+    svg += `<line x1="${startX}" y1="20" x2="${startX + w2}" y2="20" stroke="${color2}" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  
+  // Étiquettes 0 et 1
+  svg += `<text x="${pad}" y="38" font-size="12" text-anchor="middle" fill="#555">0</text>`;
+  svg += `<text x="${pad + lineW}" y="38" font-size="12" text-anchor="middle" fill="#555">1</text>`;
+  
+  svg += `</svg>`;
+  return svg;
+}
+
+// Moteur principal de mise à jour
+function render() {
+  const n1 = parseInt(document.getElementById('n1').value) || 0;
+  const d1 = parseInt(document.getElementById('d1').value) || 1;
+  const n2 = parseInt(document.getElementById('n2').value) || 0;
+  const d2 = parseInt(document.getElementById('d2').value) || 1;
+
+  // Calculs actuels avec multiplicateurs
+  const curN1 = n1 * m1; const curD1 = d1 * m1;
+  const curN2 = n2 * m2; const curD2 = d2 * m2;
+
+  // Affichage des textes
+  let txt1 = m1 > 1 ? `&times;${m1} = <span class="highlight hl-f1">${curN1} / ${curD1}</span>` : `<span class="highlight hl-f1">${n1} / ${d1}</span>`;
+  document.getElementById('math1').innerHTML = txt1;
+  
+  let txt2 = m2 > 1 ? `&times;${m2} = <span class="highlight hl-f2">${curN2} / ${curD2}</span>` : `<span class="highlight hl-f2">${n2} / ${d2}</span>`;
+  document.getElementById('math2').innerHTML = txt2;
+
+  // Affichage des SVGs individuels
+  document.getElementById('svg1').innerHTML = drawPie(curN1, curD1, C_F1) + drawLine(curN1, curD1, C_F1);
+  document.getElementById('svg2').innerHTML = drawPie(curN2, curD2, C_F2) + drawLine(curN2, curD2, C_F2);
+
+  // LOGIQUE DU RÉSULTAT
+  const resPanel = document.getElementById('result-panel');
+  
+  if (curD1 !== curD2) {
+    // Différents dénominateurs = Verrouillé
+    resPanel.innerHTML = `
+      <div class="panel-title">Résultat</div>
+      <div class="locked-state">
+        <div class="locked-icon">🔒</div>
+        <div class="locked-text">Trouvez le dénominateur commun !</div>
+        <div style="font-size:14px; text-align:center;">
+          Utilisez les boutons "Redécouper" pour que les parts bleues et vertes fassent la même taille.
+        </div>
+      </div>
+    `;
+  } else {
+    // Même dénominateur = Addition possible !
+    const totalNum = curN1 + curN2;
+    const finalD = curD1;
+    
+    // Si l'addition dépasse 1, on alerte gentiment (pour garder le visuel simple ici)
+    let extraMsg = totalNum > finalD ? `<div style="color:var(--color-locked); font-size:12px; margin-top:5px;">(Dépasse 1 unité entière !)</div>` : '';
+
+    resPanel.innerHTML = `
+      <div class="panel-title">Addition possible !</div>
+      <div class="math-text">
+        <span class="highlight hl-f1">${curN1}</span> + 
+        <span class="highlight hl-f2">${curN2}</span> = 
+        <span class="highlight" style="background:#eee;">${totalNum} / ${finalD}</span>
+      </div>
+      <div class="svg-container">
+        ${drawPie(curN1, finalD, C_F1, C_F2, curN2)}
+        ${drawLine(curN1, finalD, C_F1, C_F2, curN2)}
+      </div>
+      ${extraMsg}
+    `;
+  }
+}
+
+// Initialisation au chargement
+render();
+</script>
+
+</body>
+</html>

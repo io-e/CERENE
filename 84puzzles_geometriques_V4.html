@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Puzzles Géométriques — Calcul des aires</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F4F1EB; display: flex; justify-content: center;
+           padding: 12px 8px 32px; }
+    #root { width: 100%; max-width: 780px; }
+    svg { max-width: 100%; height: auto; display: block; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    /* ── Palette ── */
+    const C = {
+      bg:"#F4F1EB", card:"#FDFCF9", fig:"#FAFAF7",
+      hdr:"#243A5E", known:"#E4EBF5", unk:"#FDECEA",
+      stroke:"#243A5E", valK:"#1A2B47", valU:"#B83228",
+      sol:"#1D6640", accent:"#C9943A", border:"#DDD9D0",
+      muted:"#8A8070", legend:"#EDE9E0",
+    };
+
+    /* ── Bracket ── */
+    function Bracket({ axis, a, b, pos, label, col, gap = 14 }) {
+      const mid = (a + b) / 2, t = 5, c = col || C.stroke;
+      if (axis === "h") return (
+        <g>
+          <line x1={a} y1={pos} x2={b} y2={pos} stroke={c} strokeWidth="1.5"/>
+          <line x1={a} y1={pos-t} x2={a} y2={pos+t} stroke={c} strokeWidth="1.5"/>
+          <line x1={b} y1={pos-t} x2={b} y2={pos+t} stroke={c} strokeWidth="1.5"/>
+          <text x={mid} y={pos+gap} textAnchor="middle" dominantBaseline="middle"
+            fontSize="11" fontFamily="Georgia,serif" fill={c}>{label}</text>
+        </g>
+      );
+      return (
+        <g>
+          <line x1={pos} y1={a} x2={pos} y2={b} stroke={c} strokeWidth="1.5"/>
+          <line x1={pos-t} y1={a} x2={pos+t} y2={a} stroke={c} strokeWidth="1.5"/>
+          <line x1={pos-t} y1={b} x2={pos+t} y2={b} stroke={c} strokeWidth="1.5"/>
+          <text x={pos-gap} y={mid} textAnchor="middle" dominantBaseline="middle"
+            fontSize="11" fontFamily="Georgia,serif" fill={c}
+            transform={`rotate(-90,${pos-gap},${mid})`}>{label}</text>
+        </g>
+      );
+    }
+
+    /* ── Card ── */
+    function Card({ n, tx, ty, title, q1, q2, sol, note, children }) {
+      const [open, setOpen] = useState(false);
+      return (
+        <g transform={`translate(${tx},${ty})`}>
+          <rect width="350" height="330" fill={C.card} stroke={C.border} strokeWidth="1.5"/>
+          <rect width="350" height="34" fill={C.hdr}/>
+          <circle cx="20" cy="17" r="11" fill={C.accent}/>
+          <text x="20" y="17" fontFamily="Georgia,serif" fontSize="13" fontWeight="bold"
+            fill="#fff" textAnchor="middle" dominantBaseline="middle">{n}</text>
+          <text x="38" y="17" fontFamily="Georgia,serif" fontSize="12" fontWeight="bold"
+            fill="#fff" dominantBaseline="middle">{title}</text>
+          <rect y="34" width="350" height="186" fill={C.fig}/>
+          {children}
+          <line x1="10" y1="221" x2="340" y2="221" stroke={C.border} strokeWidth="1"/>
+          <text x="15" y="235" fontFamily="Georgia,serif" fontSize="11" fill="#3A3530">{q1}</text>
+          <text x="15" y="251" fontFamily="Georgia,serif" fontSize="11" fill="#3A3530">{q2}</text>
+          <g onClick={() => setOpen(o => !o)} style={{ cursor:"pointer" }}>
+            <rect x="10" y="259" width="96" height="20" rx="4"
+              fill={open ? C.sol : "transparent"} stroke={C.sol} strokeWidth="1.5"/>
+            <text x="58" y="269" textAnchor="middle" dominantBaseline="middle"
+              fontFamily="Georgia,serif" fontSize="10.5" fontWeight="600"
+              fill={open ? "#fff" : C.sol}>
+              {open ? "▲ Masquer" : "▼ Solution"}
+            </text>
+          </g>
+          {open && (
+            <g>
+              <line x1="10" y1="286" x2="340" y2="286" stroke={C.accent} strokeWidth="0.8" strokeDasharray="4,3"/>
+              <text x="15" y="300" fontFamily="Georgia,serif" fontSize="10.5"
+                fill={C.sol} fontStyle="italic">{sol}</text>
+              <text x="15" y="316" fontFamily="Georgia,serif" fontSize="9.5"
+                fill={C.muted} fontStyle="italic">{note}</text>
+            </g>
+          )}
+        </g>
+      );
+    }
+
+    /* ── Géométries ── */
+    function G1() {
+      return (
+        <g>
+          <rect x="95" y="62" width="160" height="100" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="175" y="112" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={95} b={255} pos={174} label="5 cm" gap={17}/>
+          <Bracket axis="v" a={62} b={162} pos={83} label="4 cm" gap={15}/>
+        </g>
+      );
+    }
+
+    function G2() {
+      return (
+        <g>
+          <rect x="62" y="67" width="80" height="100" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="102" y="117" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">12 cm²</text>
+          <rect x="142" y="67" width="107" height="100" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="195" y="117" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <line x1="257" y1="67" x2="257" y2="167" stroke={C.muted} strokeWidth="1" strokeDasharray="3,3"/>
+          <text x="276" y="109" fontFamily="Georgia,serif" fontSize="9" fill={C.muted} textAnchor="middle" fontStyle="italic">même</text>
+          <text x="276" y="121" fontFamily="Georgia,serif" fontSize="9" fill={C.muted} textAnchor="middle" fontStyle="italic">hauteur</text>
+          <Bracket axis="h" a={62} b={142} pos={179} label="3 cm" gap={17}/>
+          <line x1="142" y1="179" x2="249" y2="179" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="249" y1="174" x2="249" y2="184" stroke={C.stroke} strokeWidth="1.5"/>
+          <text x="195" y="196" fontFamily="Georgia,serif" fontSize="11" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle">4 cm</text>
+        </g>
+      );
+    }
+
+    function G3() {
+      return (
+        <g>
+          <rect x="40" y="82" width="60" height="90" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="70" y="127" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">10 cm²</text>
+          <rect x="100" y="82" width="90" height="90" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="145" y="127" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">15 cm²</text>
+          <rect x="190" y="82" width="120" height="90" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="250" y="127" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <line x1="40" y1="184" x2="310" y2="184" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="40" y1="179" x2="40" y2="189" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="190" y1="179" x2="190" y2="189" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="310" y1="179" x2="310" y2="189" stroke={C.stroke} strokeWidth="1.5"/>
+          <text x="115" y="201" fontFamily="Georgia,serif" fontSize="11" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle">5 cm</text>
+          <text x="250" y="201" fontFamily="Georgia,serif" fontSize="11" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle">4 cm</text>
+        </g>
+      );
+    }
+
+    function G4() {
+      return (
+        <g>
+          <rect x="100" y="50" width="150" height="66" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="175" y="83" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">18 cm²</text>
+          <rect x="100" y="116" width="150" height="88" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="175" y="160" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="v" a={50} b={116} pos={88} label="3 cm" gap={15}/>
+          <line x1="88" y1="116" x2="88" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="83" y1="204" x2="93" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <text x="73" y="160" fontFamily="Georgia,serif" fontSize="11" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle"
+            transform="rotate(-90,73,160)">4 cm</text>
+          <line x1="258" y1="50" x2="258" y2="204" stroke={C.muted} strokeWidth="1" strokeDasharray="3,3"/>
+          <text x="278" y="121" fontFamily="Georgia,serif" fontSize="9" fill={C.muted} textAnchor="middle" fontStyle="italic">même</text>
+          <text x="278" y="133" fontFamily="Georgia,serif" fontSize="9" fill={C.muted} textAnchor="middle" fontStyle="italic">largeur</text>
+        </g>
+      );
+    }
+
+    function G5() {
+      return (
+        <g>
+          <polygon points="193,109 247,109 247,181 103,181 103,73 193,73"
+            fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <rect x="193" y="73" width="54" height="36"
+            fill="#F4F1EB" stroke={C.muted} strokeWidth="1.5" strokeDasharray="5,3"/>
+          <text x="220" y="91" fontFamily="Georgia,serif" fontSize="8" fill={C.muted}
+            textAnchor="middle" dominantBaseline="middle">retiré</text>
+          <text x="175" y="130" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={103} b={247} pos={194} label="8 cm" gap={16}/>
+          <Bracket axis="v" a={73} b={181} pos={91} label="6 cm" gap={14}/>
+          <Bracket axis="h" a={193} b={247} pos={61} label="3 cm" gap={-12}/>
+          <Bracket axis="v" a={73} b={109} pos={260} label="2 cm" gap={14}/>
+        </g>
+      );
+    }
+
+    function G6() {
+      return (
+        <g>
+          <rect x="120" y="39" width="44" height="66" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="142" y="72" fontFamily="Georgia,serif" fontSize="10" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">6 cm²</text>
+          <rect x="164" y="39" width="66" height="66" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="197" y="72" fontFamily="Georgia,serif" fontSize="10" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">9 cm²</text>
+          <rect x="120" y="105" width="44" height="110" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="142" y="160" fontFamily="Georgia,serif" fontSize="10" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">10 cm²</text>
+          <rect x="164" y="105" width="66" height="110" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="197" y="160" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="v" a={39} b={105} pos={248} label="3 cm" gap={16}/>
+        </g>
+      );
+    }
+
+    function G7() {
+      return (
+        <g>
+          <rect x="126" y="62" width="98" height="42" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="175" y="83" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">21 cm²</text>
+          <rect x="168" y="104" width="56" height="42" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="196" y="125" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={126} b={224} pos={50} label="7 cm" gap={-11}/>
+          <Bracket axis="h" a={168} b={224} pos={158} label="4 cm" gap={14}/>
+          <Bracket axis="v" a={104} b={146} pos={236} label="3 cm" gap={14}/>
+        </g>
+      );
+    }
+
+    function G8() {
+      return (
+        <g>
+          <rect x="65" y="87" width="44" height="100" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="87" y="137" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">10 cm²</text>
+          <rect x="109" y="87" width="110" height="100" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="164" y="137" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">25 cm²</text>
+          <rect x="219" y="87" width="66" height="100" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="252" y="137" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={65} b={285} pos={74} label="10 cm" col={C.accent} gap={-10}/>
+          <line x1="65" y1="199" x2="285" y2="199" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="65" y1="194" x2="65" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="109" y1="194" x2="109" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="219" y1="194" x2="219" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <line x1="285" y1="194" x2="285" y2="204" stroke={C.stroke} strokeWidth="1.5"/>
+          <text x="87" y="214" fontFamily="Georgia,serif" fontSize="10" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle">2 cm</text>
+          <text x="164" y="214" fontFamily="Georgia,serif" fontSize="10" fill={C.stroke}
+            textAnchor="middle" dominantBaseline="middle">5 cm</text>
+        </g>
+      );
+    }
+
+    function G9() {
+      return (
+        <g>
+          <rect x="90" y="130" width="100" height="80" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="140" y="170" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">20 cm²</text>
+          <rect x="190" y="50" width="60" height="80" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <text x="220" y="90" fontFamily="Georgia,serif" fontSize="12" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">12 cm²</text>
+          <polygon points="190,50 90,130 190,130" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <polygon points="190,50 90,130 190,130" fill="url(#hatch9)" stroke="none"/>
+          <polyline points="183,130 183,123 190,123" fill="none" stroke={C.stroke} strokeWidth="1.4"/>
+          <text x="157" y="103" fontFamily="Georgia,serif" fontSize="16" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={190} b={250} pos={38} label="3 cm" gap={-9}/>
+          <Bracket axis="v" a={130} b={210} pos={78} label="4 cm" gap={14}/>
+        </g>
+      );
+    }
+
+    function G10() {
+      return (
+        <g>
+          <polygon points="105,85 25,185 105,185" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <polyline points="98,185 98,178 105,178" fill="none" stroke={C.stroke} strokeWidth="1.4"/>
+          <text x="75" y="158" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">10 cm²</text>
+          <rect x="105" y="85" width="100" height="100" fill={C.unk} stroke={C.stroke} strokeWidth="2"/>
+          <text x="153" y="157" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">25 cm²</text>
+          <polygon points="325,185 205,85 205,185" fill={C.known} stroke={C.stroke} strokeWidth="2"/>
+          <polyline points="205,178 212,178 212,185" fill="none" stroke={C.stroke} strokeWidth="1.4"/>
+          <text x="248" y="158" fontFamily="Georgia,serif" fontSize="11" fontWeight="600"
+            fill={C.valK} textAnchor="middle" dominantBaseline="middle">15 cm²</text>
+          <line x1="105" y1="73" x2="205" y2="73" stroke={C.valU} strokeWidth="1.8"/>
+          <line x1="105" y1="68" x2="105" y2="78" stroke={C.valU} strokeWidth="1.8"/>
+          <line x1="205" y1="68" x2="205" y2="78" stroke={C.valU} strokeWidth="1.8"/>
+          <text x="155" y="62" fontFamily="Georgia,serif" fontSize="13" fontWeight="bold"
+            fill={C.valU} textAnchor="middle" dominantBaseline="middle">?</text>
+          <Bracket axis="h" a={25} b={325} pos={197} label="15 cm" gap={17}/>
+        </g>
+      );
+    }
+
+    /* ── Données ── */
+    const PUZZLES = [
+      { n:1,  tx:20,  ty:90,   title:"Le rectangle de départ",
+        q1:"Ce rectangle a une largeur de 5 cm et une hauteur de 4 cm.",
+        q2:"Quelle est son aire ?",
+        sol:"Solution : 5 × 4 = 20 cm²",
+        note:"L'aire d'un rectangle = longueur × largeur.", G:G1 },
+      { n:2,  tx:390, ty:90,   title:"Le rectangle caché",
+        q1:"Deux rectangles de même hauteur (inconnue). Gauche :",
+        q2:"largeur 3 cm, aire 12 cm². Droite : largeur 4 cm. Aire ?",
+        sol:"Solution : hauteur = 12 ÷ 3 = 4 cm  →  4 × 4 = 16 cm²",
+        note:"La hauteur commune est implicite — elle se retrouve par division.", G:G2 },
+      { n:3,  tx:20,  ty:440,  title:"La rangée de trois",
+        q1:"3 rectangles, même hauteur inconnue. Largeurs : 2, 3, 4 cm.",
+        q2:"Aires du 1ᵉʳ et 2ᵉ : 10 et 15 cm². Trouver l'aire du 3ᵉ.",
+        sol:"Solution : h = 10÷2 = 5 cm  (vérif. 3×5=15 ✓)  →  4×5 = 20 cm²",
+        note:"Le 2ᵉ rectangle confirme la hauteur avant de calculer le 3ᵉ.", G:G3 },
+      { n:4,  tx:390, ty:440,  title:"L'empilement",
+        q1:"Deux rectangles empilés, même largeur (inconnue).",
+        q2:"Hauteurs : 3 cm (18 cm²) et 4 cm. Quelle est l'aire du 2ᵉ ?",
+        sol:"Solution : largeur = 18 ÷ 3 = 6 cm  →  6 × 4 = 24 cm²",
+        note:"Même logique que l'étape 2, mais la dimension partagée est horizontale.", G:G4 },
+      { n:5,  tx:20,  ty:790,  title:"La figure en L",
+        q1:"Figure en L : rectangle 8×6 cm amputé d'un coin de 3×2 cm.",
+        q2:"Quelle est l'aire de la figure en L ?",
+        sol:"Solution : (8×6) − (3×2) = 48 − 6 = 42 cm²",
+        note:"Calculer le tout, puis soustraire la partie retirée.", G:G5 },
+      { n:6,  tx:390, ty:790,  title:"La grille 2×2 guidée",
+        q1:"Grille 2×2. Hauteur rangée du haut : 3 cm. Aires connues :",
+        q2:"6, 9 et 10 cm². Trouver l'aire du 4ᵉ rectangle.",
+        sol:"Solution : w=2, w=3 cm, h=5 cm  →  3 × 5 = 15 cm²",
+        note:"Chaque aire connue déverrouille une dimension cachée.", G:G6 },
+      { n:7,  tx:20,  ty:1140, title:"Le prolongement en L",
+        q1:"Rectangle du haut : largeur 7 cm, aire 21 cm². Un rectangle",
+        q2:"(4 cm × 3 cm) lui est accolé en bas à droite. Quelle est son aire ?",
+        sol:"Solution : hauteur = 21 ÷ 7 = 3 cm  →  4 × 3 = 12 cm²",
+        note:"La hauteur du grand rectangle est implicitement celle du petit.", G:G7 },
+      { n:8,  tx:390, ty:1140, title:"La vérification double",
+        q1:"3 rectangles, même hauteur. Largeurs : 2, 5 et 3 cm.",
+        q2:"Aires : 10 et 25 cm². Confirmer la hauteur et trouver le 3ᵉ.",
+        sol:"Solution : h = 10÷2 = 5 cm  (vérif. 5×5=25 ✓)  →  3×5 = 15 cm²",
+        note:"Le crochet orange montre que 2+5=7 cm couvre les 2 premiers.", G:G8 },
+      { n:9,  tx:20,  ty:1490, title:"Triangle et rectangles",
+        q1:"Triangle (haché) accolé à deux rectangles. On connaît",
+        q2:"3 cm, 4 cm, 12 cm² et 20 cm². Quelle est l'aire du triangle ?",
+        sol:"Solution : base=20÷4=5 cm, hauteur=4 cm  →  5×4÷2 = 10 cm²",
+        note:"Les rectangles donnent les deux cathètes du triangle. Aire = b×h÷2.", G:G9 },
+      { n:10, tx:390, ty:1490, title:"Le trapèze découpé",
+        q1:"Trapèze découpé en 3 : deux triangles (10 et 15 cm²) encadrent",
+        q2:"un rectangle. Base totale = 15 cm. Quelle est la largeur du rectangle ?",
+        sol:"Solution : h=75÷15=5 cm  →  ?=25÷5=5 cm  (b_L=4, b_R=6 ✓)",
+        note:"Ici c'est une longueur qui est inconnue, et non une aire.", G:G10 },
+    ];
+
+    /* ── App ── */
+    function App() {
+      return (
+        <svg width="760" height="1840" viewBox="0 0 760 1840" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9"
+              patternTransform="rotate(45)">
+              <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" strokeWidth="1.4" opacity="0.55"/>
+            </pattern>
+          </defs>
+
+          <rect width="760" height="1840" fill={C.bg}/>
+
+          {/* Header */}
+          <rect width="760" height="58" fill={C.hdr}/>
+          <text x="380" y="27" fontFamily="Georgia,serif" fontSize="18" fontWeight="bold"
+            fill="#fff" textAnchor="middle">Puzzles géométriques — Calcul des aires</text>
+          <text x="380" y="47" fontFamily="Georgia,serif" fontSize="11" fill={C.accent}
+            textAnchor="middle">Dans chaque puzzle, trouver l'aire marquée ? — uniquement par le calcul des aires de rectangles et de triangles</text>
+
+          {/* Legend */}
+          <rect y="58" width="760" height="22" fill={C.legend}/>
+          <rect x="20" y="63" width="14" height="12" fill={C.known} stroke={C.stroke} strokeWidth="1"/>
+          <text x="38" y="69" fontFamily="Georgia,serif" fontSize="11" fill="#3A3530" dominantBaseline="middle">Aire connue</text>
+          <rect x="122" y="63" width="14" height="12" fill={C.unk} stroke={C.valU} strokeWidth="1"/>
+          <text x="140" y="69" fontFamily="Georgia,serif" fontSize="11" fill={C.valU} dominantBaseline="middle" fontWeight="bold">?</text>
+          <text x="152" y="69" fontFamily="Georgia,serif" fontSize="11" fill="#3A3530" dominantBaseline="middle">(aire à trouver)</text>
+          <text x="350" y="69" fontFamily="Georgia,serif" fontSize="10" fill={C.muted} dominantBaseline="middle" fontStyle="italic">Les dimensions implicites se retrouvent par le calcul — aucune lettre n'est requise.</text>
+
+          {/* Cards */}
+          {PUZZLES.map(p => (
+            <Card key={p.n} n={p.n} tx={p.tx} ty={p.ty} title={p.title}
+              q1={p.q1} q2={p.q2} sol={p.sol} note={p.note}>
+              <p.G/>
+            </Card>
+          ))}
+
+          {/* Footer */}
+          <rect y="1825" width="760" height="15" fill={C.legend}/>
+          <text x="380" y="1833" fontFamily="Georgia,serif" fontSize="9" fill={C.muted}
+            textAnchor="middle" dominantBaseline="middle">
+            Progression inspirée des Area Mazes japonais (Naoki Inaba) et de l'approche géométrique de Graham Jones — aucune variable algébrique n'est requise.
+          </text>
+        </svg>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>

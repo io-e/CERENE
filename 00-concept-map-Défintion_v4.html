@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carte Conceptuelle — Fractions 3ème · 14 Types</title>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #080c14;
+    color: #d4cfbf;
+    font-family: 'Crimson Pro', Georgia, serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 0.6rem 1.2rem;
+    background: #0d1321;
+    border-bottom: 1px solid #1c2540;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    gap: 1rem;
+  }
+  header h1 { font-size: 0.95rem; font-weight: 600; letter-spacing: 0.05em; color: #c8a84b; white-space: nowrap; }
+  .hint { font-family: 'Fira Code', monospace; font-size: 0.68rem; color: #4a566e; white-space: nowrap; }
+
+  .workspace { flex: 1; display: flex; overflow: hidden; position: relative; }
+  #map-wrap { flex: 1; overflow: hidden; cursor: grab; position: relative; }
+  #map-wrap:active { cursor: grabbing; }
+  svg#map { width: 100%; height: 100%; display: block; }
+
+  /* ── Panel ── */
+  #panel {
+    position: absolute; right: 0; top: 0; bottom: 0; width: 295px;
+    background: #0d1321; border-left: 1px solid #1c2540;
+    display: flex; flex-direction: column;
+    transform: translateX(100%); transition: transform 0.22s ease; z-index: 20;
+  }
+  #panel.open { transform: translateX(0); }
+  .panel-top { padding: 1rem 1rem 0.85rem; position: relative; border-bottom: 1px solid #1c2540; }
+  .p-bar { position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+  .p-close { position: absolute; top: 0.55rem; right: 0.75rem; background: none; border: none; color: #4a566e; font-size: 1rem; cursor: pointer; padding: 2px 5px; border-radius: 4px; transition: 0.15s; }
+  .p-close:hover { background: #1c2540; color: #d4cfbf; }
+  .p-title { font-size: 1.15rem; font-weight: 600; color: #e8e3d0; margin-top: 0.35rem; padding-right: 1.5rem; line-height: 1.3; }
+  .p-type  { font-family: 'Fira Code', monospace; font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.2rem; }
+  .panel-body { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
+  .panel-body::-webkit-scrollbar { width: 4px; }
+  .panel-body::-webkit-scrollbar-track { background: transparent; }
+  .panel-body::-webkit-scrollbar-thumb { background: #1c2540; border-radius: 2px; }
+  .p-sec-label { font-family: 'Fira Code', monospace; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.12em; color: #4a566e; margin-bottom: 0.3rem; }
+  .p-formula { font-family: 'Fira Code', monospace; font-size: 0.85rem; color: #c8a84b; background: #080c14; border: 1px solid #1c2540; border-radius: 6px; padding: 0.6rem 0.75rem; line-height: 1.8; white-space: pre; }
+  .p-desc { font-size: 0.91rem; line-height: 1.6; color: #9a9585; }
+  .p-example { font-family: 'Fira Code', monospace; font-size: 0.78rem; line-height: 1.85; background: #080c14; border-left: 3px solid; border-radius: 0 4px 4px 0; padding: 0.5rem 0.75rem; color: #b8b3a0; white-space: pre; }
+  .p-rule { font-family: 'Fira Code', monospace; font-size: 0.78rem; color: #e8c86a; background: rgba(200,168,75,0.08); border: 1px solid rgba(200,168,75,0.25); border-radius: 6px; padding: 0.5rem 0.75rem; line-height: 1.75; }
+
+  /* ── Controls ── */
+  .ctrl { position: absolute; bottom: 1.2rem; left: 1.2rem; display: flex; flex-direction: column; gap: 4px; z-index: 10; }
+  .cb { width: 30px; height: 30px; background: #0d1321; border: 1px solid #1c2540; border-radius: 6px; color: #7a8698; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: 0.15s; }
+  .cb:hover { background: #1c2540; color: #d4cfbf; }
+
+  .legend { position: absolute; bottom: 1.2rem; right: 1.2rem; background: #0d1321; border: 1px solid #1c2540; border-radius: 8px; padding: 0.6rem 0.85rem; z-index: 10; }
+  .leg-title { font-family: 'Fira Code', monospace; font-size: 0.58rem; text-transform: uppercase; letter-spacing: 0.1em; color: #4a566e; margin-bottom: 0.45rem; }
+  .leg-item { display: flex; align-items: center; gap: 7px; font-size: 0.75rem; color: #7a8698; margin-bottom: 3px; }
+  .leg-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .leg-sq  { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+  .leg-dash{ width: 18px; height: 0; border-top: 2px dashed #3a4560; flex-shrink: 0; }
+
+  /* ── Badge counter ── */
+  .badge { position: absolute; top: 0.6rem; left: 50%; transform: translateX(-50%); background: #0d1321; border: 1px solid #1c2540; border-radius: 12px; padding: 0.2rem 0.7rem; font-family: 'Fira Code', monospace; font-size: 0.62rem; color: #4a566e; pointer-events: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>◈ Carte Conceptuelle — Calculs de Fractions (3ème) · 14 Types</h1>
+  <span class="hint">scroll: zoom &nbsp;·&nbsp; drag: déplacer &nbsp;·&nbsp; clic: détails</span>
+</header>
+
+<div class="workspace">
+  <div id="map-wrap">
+    <svg id="map"></svg>
+
+    <div class="ctrl">
+      <button class="cb" id="zIn"    title="Zoom +">+</button>
+      <button class="cb" id="zOut"   title="Zoom −">−</button>
+      <button class="cb" id="zReset" title="Centrer" style="font-size:.68rem">⌂</button>
+    </div>
+
+    <div class="legend">
+      <div class="leg-title">Légende</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#c8a84b"></div>Nœud central</div>
+      <div class="leg-item"><div class="leg-dot" style="background:#3B82F6"></div>Catégorie</div>
+      <div class="leg-item"><div class="leg-sq"  style="background:#3a4560"></div>Type d'exercice</div>
+      <div class="leg-item"><div class="leg-dash"></div>Lien transversal</div>
+    </div>
+  </div>
+
+  <div id="panel">
+    <div class="panel-top">
+      <div class="p-bar"   id="pBar"></div>
+      <button class="p-close" id="pClose">✕</button>
+      <div class="p-title" id="pTitle"></div>
+      <div class="p-type"  id="pType"></div>
+    </div>
+    <div class="panel-body" id="pBody"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — 6 categories · 14 types · 3 outils
+// ═══════════════════════════════════════════════════════════
+const NODES = [
+
+  // ── ROOT ────────────────────────────────────────────────
+  { id:'root', type:'root', x:1050, y:545, label:['Calculs de','Fractions'], sub:'14 types · Niveau 3ème', color:'#C8A84B', r:68,
+    d:{ title:'Calculs de Fractions', type:'Vue d\'ensemble · 3ème',
+        formula:null, rule:null,
+        desc:'6 familles d\'exercices couvrant les opérations fondamentales, fractions imbriquées, puissances & exposants, racines, priorités opératoires et outils de simplification.',
+        ex:null }},
+
+  // ── CATÉGORIES ──────────────────────────────────────────
+  { id:'ops',      type:'cat', x:1050, y:160,  label:['Opérations','Fondamentales'], color:'#3B82F6', r:53,
+    d:{ title:'Opérations Fondamentales', type:'Catégorie', formula:'÷  ±  Σ inverses',
+        desc:'Addition, soustraction, division de fractions et somme de fractions unitaires.', ex:null, rule:null }},
+  { id:'nested',   type:'cat', x:1400, y:300,  label:['Fractions','Imbriquées'],    color:'#8B5CF6', r:53,
+    d:{ title:'Fractions Imbriquées', type:'Catégorie', formula:'f = (…) / (…)',
+        desc:'Fractions dont le numérateur ou le dénominateur contient lui-même une expression fractionnaire. Toujours simplifier de l\'intérieur vers l\'extérieur.', ex:null, rule:null }},
+  { id:'powers',   type:'cat', x:1470, y:640,  label:['Puissances','& Exposants'],  color:'#EF4444', r:53,
+    d:{ title:'Puissances & Exposants', type:'Catégorie', formula:'aⁿ · (a/b)ⁿ · a⁻ⁿ',
+        desc:'Cinq règles d\'exposants : puissance d\'une fraction, exposant négatif, produit/quotient de même base, produit avec regroupement de bases.', ex:null, rule:null }},
+  { id:'priority', type:'cat', x:720,  y:830,  label:['Priorités','& Parenthèses'], color:'#F59E0B', r:53,
+    d:{ title:'Priorités & Parenthèses', type:'Catégorie', formula:'( ) > × > ±',
+        desc:'Trois expressions combinées nécessitant de respecter l\'ordre des opérations : × avant ±, parenthèses avant tout, et soustraction avant division.', ex:null, rule:null }},
+  { id:'simplify', type:'cat', x:470,  y:290,  label:['Simplification','& Outils'], color:'#10B981', r:53,
+    d:{ title:'Simplification & Outils', type:'Catégorie', formula:'PGCD · PPCM · irréductible',
+        desc:'Trois outils indispensables pour simplifier les résultats : le PGCD pour réduire une fraction, le PPCM pour trouver un dénominateur commun, la vérification d\'irréductibilité.', ex:null, rule:null }},
+  { id:'racines',  type:'cat', x:960,  y:850,  label:['Racines','de Fractions'],   color:'#06B6D4', r:48,
+    d:{ title:'Racines de Fractions', type:'Catégorie', formula:'√(a²/b²) = |a|/|b|',
+        desc:'Appliquer la racine carrée à une fraction en l\'appliquant séparément au numérateur et au dénominateur.', ex:null, rule:null }},
+
+  // ── OPS leaves ─────────────────────────────────────────
+  { id:'t4', type:'leaf', parent:'ops', x:680, y:22, label:['Type 4'], short:'a/b ± c/d', color:'#3B82F6', r:41,
+    d:{ title:'Type 4 — Addition / Soustraction', type:'Opérations fondamentales',
+        formula:'a   c   ad ± bc\n─ ± ─ = ────────\nb   d     bd',
+        rule:'Trouver le PPCM(b, d), puis réduire\nau même dénominateur avant d\'additionner.',
+        desc:'Additionner ou soustraire deux fractions : trouver le PPCM des dénominateurs, exprimer chaque fraction avec ce dénominateur commun, puis combiner les numérateurs.',
+        ex:'1/3 + 1/4\nPPCM(3,4) = 12\n= 4/12 + 3/12\n= 7/12' }},
+  { id:'t3', type:'leaf', parent:'ops', x:1050, y:3,  label:['Type 3'], short:'a/b ÷ c/d', color:'#3B82F6', r:41,
+    d:{ title:'Type 3 — Division de Fractions', type:'Opérations fondamentales',
+        formula:'a   c   a   d   ad\n─ ÷ ─ = ─ × ─ = ──\nb   d   b   c   bc',
+        rule:'Diviser par c/d = multiplier par d/c\n(l\'inverse du diviseur).',
+        desc:'Inverser la deuxième fraction puis multiplier. Simplification possible en croix avant de calculer.',
+        ex:'3/4 ÷ 9/8\n= 3/4 × 8/9\n= 24/36\n= 2/3' }},
+  { id:'t8', type:'leaf', parent:'ops', x:1415, y:52, label:['Type 8'], short:'1/a + 1/b', color:'#3B82F6', r:41,
+    d:{ title:'Type 8 — Somme d\'Inverses', type:'Opérations fondamentales',
+        formula:'1   1   a + b\n─ + ─ = ─────\na   b    a×b',
+        rule:'Formule directe : PPCM(a, b) = a×b\nquand a et b sont premiers entre eux.',
+        desc:'Additionner deux fractions unitaires. La formule (a+b)/(a×b) est un raccourci de la mise au même dénominateur — il faut vérifier que le résultat est bien simplifié.',
+        ex:'1/4 + 1/6\n= (4+6)/(4×6)\n= 10/24\n= 5/12' }},
+
+  // ── NESTED leaves ───────────────────────────────────────
+  { id:'t1', type:'leaf', parent:'nested', x:1740, y:135, label:['Type 1'], short:'1/(1+1/a)', color:'#8B5CF6', r:41,
+    d:{ title:'Type 1 — Fraction Composée', type:'Fractions imbriquées',
+        formula:'      1\n  ─────────\n  1 + (1/a)',
+        rule:'Simplifier le dénominateur d\'abord :\n1 + 1/a = (a+1)/a\nPuis inverser : 1 ÷ (a+1)/a = a/(a+1).',
+        desc:'Fraction dont le dénominateur contient lui-même une fraction. Réduire d\'abord l\'expression intérieure.',
+        ex:'a = 5 :\n1 + 1/5 = 6/5\n→ 1 ÷ 6/5\n= 1 × 5/6\n= 5/6' }},
+  { id:'t6', type:'leaf', parent:'nested', x:1790, y:375, label:['Type 6'], short:'(a+b/c)/d', color:'#8B5CF6', r:41,
+    d:{ title:'Type 6 — Entier + Fraction / Entier', type:'Fractions imbriquées',
+        formula:'a + b/c   ac + b\n─────── = ──────\n   d        cd',
+        rule:'Transformer a en a/1, puis :\na + b/c = (ac+b)/c\nEnfin diviser par d : résultat = (ac+b)/(cd).',
+        desc:'Transformer l\'entier en fraction, additionner au numérateur, puis diviser l\'ensemble par d.',
+        ex:'a=2, b=1, c=3, d=5 :\n2 + 1/3 = 7/3\n(7/3) ÷ 5\n= 7/3 × 1/5\n= 7/15' }},
+
+  // ── POWERS leaves ───────────────────────────────────────
+  { id:'t2', type:'leaf', parent:'powers', x:1840, y:460, label:['Type 2'], short:'(a/b)ⁿ', color:'#EF4444', r:41,
+    d:{ title:'Type 2 — Puissance de Fraction', type:'Puissances & Exposants',
+        formula:'(a)ⁿ   aⁿ\n(─) = ──\n(b)    bⁿ',
+        rule:'L\'exposant s\'applique séparément\nau numérateur ET au dénominateur.',
+        desc:'Calculer aⁿ et bⁿ indépendamment, puis simplifier la fraction obtenue par leur PGCD.',
+        ex:'(2/3)³\n= 2³/3³\n= 8/27\npgcd(8,27)=1 → irréductible' }},
+  { id:'t9', type:'leaf', parent:'powers', x:1870, y:650, label:['Type 9'], short:'(a/b)⁻ⁿ', color:'#EF4444', r:41,
+    d:{ title:'Type 9 — Puissance Négative', type:'Puissances & Exposants',
+        formula:'(a/b)⁻ⁿ = (b/a)ⁿ = bⁿ/aⁿ',
+        rule:'Exposant négatif → inverser la fraction,\nl\'exposant devient positif.',
+        desc:'Deux étapes : (1) inverser la fraction a/b → b/a, (2) élever à l\'exposant positif n.',
+        ex:'(2/3)⁻²\n= (3/2)²\n= 3²/2²\n= 9/4' }},
+  { id:'t7', type:'leaf', parent:'powers', x:1810, y:845, label:['Type 7'], short:'(aⁿ/bᵖ)×(bᵠ/aᵐ)', color:'#EF4444', r:41,
+    d:{ title:'Type 7 — Produit avec Puissances', type:'Puissances & Exposants',
+        formula:'aⁿ   bᵠ   aⁿ⁻ᵐ\n── × ── = ────\nbᵖ   aᵐ   bᵖ⁻ᵠ',
+        rule:'Regrouper les bases identiques,\npuis aˣ/aʸ = aˣ⁻ʸ (soustraction d\'exposants).',
+        desc:'Regrouper toutes les puissances de a ensemble et toutes les puissances de b ensemble. Appliquer la règle de division de puissances de même base.',
+        ex:'(2⁴/3²)×(3³/2¹)\n= 2⁴⁻¹/3²⁻³\n= 2³/3⁻¹\n= 8 × 3\n= 24' }},
+  { id:'t13', type:'leaf', parent:'powers', x:1575, y:988, label:['Type 13'], short:'aⁿ × aᵖ', color:'#EF4444', r:41,
+    d:{ title:'Type 13 — Produit de Même Base', type:'Puissances & Exposants',
+        formula:'aⁿ × aᵖ = aⁿ⁺ᵖ',
+        rule:'Multiplication → on ADDITIONNE les exposants\n(même base obligatoire).',
+        desc:'Règle fondamentale des exposants : multiplier des puissances de même base revient à additionner leurs exposants. Si n+p < 0, la puissance passe au dénominateur.',
+        ex:'5³ × 5⁴ = 5³⁺⁴ = 5⁷\n\n3² × 3⁻⁵\n= 3²⁺⁽⁻⁵⁾\n= 3⁻³\n= 1/27' }},
+  { id:'t5', type:'leaf', parent:'powers', x:1320, y:1010, label:['Type 5'], short:'aⁿ / aᵖ', color:'#EF4444', r:41,
+    d:{ title:'Type 5 — Quotient de Même Base', type:'Puissances & Exposants',
+        formula:'aⁿ\n── = aⁿ⁻ᵖ\naᵖ',
+        rule:'Division → on SOUSTRAIT les exposants\n(même base obligatoire).',
+        desc:'Diviser des puissances de même base revient à soustraire l\'exposant du dénominateur de celui du numérateur. Complément du Type 13.',
+        ex:'3⁵ / 3² = 3⁵⁻² = 3³ = 27\n\n2³ / 2⁵\n= 2³⁻⁵\n= 2⁻²\n= 1/4' }},
+
+  // ── PRIORITY leaves ─────────────────────────────────────
+  { id:'t10', type:'leaf', parent:'priority', x:375, y:1000, label:['Type 10'], short:'a/b×c/d+e/f', color:'#F59E0B', r:41,
+    d:{ title:'Type 10 — Priorité × avant +', type:'Priorités & Parenthèses',
+        formula:'a/b × c/d + e/f\n= ac/bd + e/f',
+        rule:'La multiplication est PRIORITAIRE\nsur l\'addition. Calculer × en premier.',
+        desc:'Sans parenthèses, la multiplication est toujours effectuée avant l\'addition. Calculer a/b × c/d, simplifier, puis additionner e/f.',
+        ex:'2/3 × 3/4 + 1/6\n= 6/12 + 1/6\n= 1/2 + 1/6\n= 3/6 + 1/6\n= 4/6 = 2/3' }},
+  { id:'t11', type:'leaf', parent:'priority', x:580, y:1072, label:['Type 11'], short:'(a/b±c/d)×e/f', color:'#F59E0B', r:41,
+    d:{ title:'Type 11 — Parenthèses puis ×', type:'Priorités & Parenthèses',
+        formula:'(a/b ± c/d) × e/f',
+        rule:'Les parenthèses sont TOUJOURS prioritaires.\nCalculer d\'abord ce qui est à l\'intérieur.',
+        desc:'Calculer la somme/différence entre parenthèses (via PPCM), simplifier, puis multiplier le résultat par e/f.',
+        ex:'(1/2 + 1/3) × 6/5\nPPCM(2,3)=6\n= (3/6+2/6) × 6/5\n= 5/6 × 6/5\n= 1' }},
+  { id:'t14', type:'leaf', parent:'priority', x:255, y:870, label:['Type 14'], short:'(a/b−c/d)÷e/f', color:'#F59E0B', r:41,
+    d:{ title:'Type 14 — Soustraction puis ÷', type:'Priorités & Parenthèses',
+        formula:'(a/b − c/d) ÷ e/f',
+        rule:'Parenthèses d\'abord, puis diviser\n= multiplier par l\'inverse de e/f.',
+        desc:'Effectuer la soustraction dans les parenthèses (PPCM), simplifier la différence, puis diviser par e/f en multipliant par f/e.',
+        ex:'(5/6 − 1/4) ÷ 7/12\nPPCM(6,4)=12\n= (10−3)/12 ÷ 7/12\n= 7/12 × 12/7\n= 1' }},
+
+  // ── SIMPLIFY tools ──────────────────────────────────────
+  { id:'pgcd', type:'leaf', parent:'simplify', x:295, y:490, label:['PGCD'], color:'#10B981', r:41,
+    d:{ title:'PGCD — Algorithme d\'Euclide', type:'Outil · simplification',
+        formula:'pgcd(a, b)\na = bq + r\n→ pgcd(a,b) = pgcd(b,r)',
+        rule:'Divisions successives jusqu\'à r = 0.\nLe dernier reste non nul est le PGCD.',
+        desc:'Plus Grand Commun Diviseur. Sert à simplifier une fraction en divisant numérateur et dénominateur par le PGCD.',
+        ex:'pgcd(24, 36) :\n36 = 1×24 + 12\n24 = 2×12 + 0\n→ pgcd = 12\n24/36 = 2/3' }},
+  { id:'ppcm', type:'leaf', parent:'simplify', x:200, y:175, label:['PPCM'], color:'#10B981', r:41,
+    d:{ title:'PPCM — Plus Petit Commun Multiple', type:'Outil · simplification',
+        formula:'ppcm(a, b) = a×b / pgcd(a,b)',
+        rule:'Indispensable pour additionner/soustraire\ndes fractions (Types 4, 8, 10, 11, 14).',
+        desc:'Le PPCM donne le plus petit dénominateur commun. Il sert à réduire deux fractions au même dénominateur avant d\'additionner ou de soustraire.',
+        ex:'ppcm(4, 6) :\npgcd(4,6) = 2\n→ ppcm = 4×6/2 = 12\n\n1/4 + 1/6 → dén. commun 12' }},
+  { id:'irred', type:'leaf', parent:'simplify', x:310, y:80, label:['Forme','Irréductible'], color:'#10B981', r:41,
+    d:{ title:'Forme Irréductible', type:'Outil · simplification',
+        formula:'n/d irréductible ⟺ pgcd(n,d) = 1',
+        rule:'Toujours vérifier l\'irréductibilité\nen fin de calcul.',
+        desc:'Une fraction est irréductible quand son numérateur et son dénominateur n\'ont aucun diviseur commun autre que 1. C\'est la forme finale attendue dans tout exercice.',
+        ex:'8/12 → pgcd(8,12)=4\n→ 8÷4 / 12÷4\n= 2/3\npgcd(2,3)=1 → irréductible ✓' }},
+  { id:'decomp', type:'leaf', parent:'simplify', x:185, y:410, label:['Décomposition','en premiers'], color:'#10B981', r:41,
+    d:{ title:'Décomposition en Nombres Premiers', type:'Outil · simplification',
+        formula:'n = p₁ × p₂ × p₃ × …\n(pᵢ premiers)',
+        rule:'Diviser successivement par 2, 3, 5, 7…\njusqu\'à obtenir 1.',
+        desc:'Écrire un entier comme produit de facteurs premiers (irréductibles). Méthode : diviser par le plus petit premier possible, recommencer avec le quotient jusqu\'à atteindre 1. Utile pour trouver le PGCD et le PPCM de deux entiers.',
+        ex:'Décomposer 60 :\n60 ÷ 2 = 30\n30 ÷ 2 = 15\n15 ÷ 3 = 5\n 5 ÷ 5 = 1\n→ 60 = 2 × 2 × 3 × 5' }},
+  { id:'decomp_pow', type:'leaf', parent:'simplify', x:145, y:295, label:['Décomposition','avec puissances'], color:'#10B981', r:41,
+    d:{ title:'Décomposition avec Puissances', type:'Outil · simplification',
+        formula:'n = p₁^α × p₂^β × p₃^γ × …',
+        rule:'PGCD → prendre chaque premier au\nplus PETIT exposant commun.\nPPCM → prendre au plus GRAND.',
+        desc:'Écriture condensée de la décomposition : regrouper les facteurs premiers identiques en puissances. Permet de calculer PGCD et PPCM directement par lecture des exposants.',
+        ex:'360 = 2³ × 3² × 5\n 84 = 2² × 3  × 7\n\npgcd = 2² × 3 = 12\nppcm = 2³ × 3² × 5 × 7\n     = 2520' }},
+
+  // ── DÉFINITIONS category + leaves ───────────────────────
+  { id:'defs', type:'cat', x:-55, y:680, label:['Définitions','Clés'], color:'#A78BFA', r:53,
+    d:{ title:'Définitions Clés', type:'Catégorie',
+        formula:'vocabulaire fondamental',
+        desc:'Les six notions à maîtriser avant d\'aborder les calculs. Chaque définition est reliée aux branches de la carte où elle intervient directement.',
+        ex:null, rule:null }},
+
+  { id:'d_frac', type:'leaf', parent:'defs', x:-250, y:530, label:['Fraction'], color:'#A78BFA', r:41,
+    d:{ title:'Fraction', type:'Définition',
+        formula:'a/b  (b ≠ 0)',
+        rule:'a = numérateur (au-dessus)\nb = dénominateur (en-dessous)\nb ≠ 0 toujours.',
+        desc:'Quotient de deux entiers a et b, avec b non nul. Représente une partie d\'un tout ou le résultat d\'une division. Toute fraction peut être simplifiée si pgcd(a,b) > 1.',
+        ex:'3/4 : 3 parts sur 4\n7/1 = 7 (entier)\n0/5 = 0\n5/0 → impossible' }},
+
+  { id:'d_nbp', type:'leaf', parent:'defs', x:-280, y:680, label:['Nombre','Premier'], color:'#A78BFA', r:41,
+    d:{ title:'Nombre Premier', type:'Définition',
+        formula:'p > 1  divisible\nuniquement par 1 et p',
+        rule:'Liste à connaître :\n2, 3, 5, 7, 11, 13, 17, 19, 23…\n1 n\'est PAS premier.',
+        desc:'Un nombre premier n\'a exactement que deux diviseurs : 1 et lui-même. Tout entier > 1 peut s\'écrire de façon unique comme produit de nombres premiers (théorème fondamental de l\'arithmétique).',
+        ex:'7 → diviseurs : 1 et 7 ✓ premier\n9 → diviseurs : 1, 3, 9 ✗ composé\n2 → seul premier pair' }},
+
+  { id:'d_puiss', type:'leaf', parent:'defs', x:-245, y:835, label:['Puissance'], color:'#A78BFA', r:41,
+    d:{ title:'Puissance', type:'Définition',
+        formula:'aⁿ = a × a × … × a\n      (n fois)',
+        rule:'a⁰ = 1  (a ≠ 0)\na¹ = a\na⁻ⁿ = 1/aⁿ',
+        desc:'aⁿ signifie que a est multiplié par lui-même n fois. n est l\'exposant, a est la base. L\'exposant peut être nul (résultat 1) ou négatif (passage au dénominateur).',
+        ex:'2³ = 2×2×2 = 8\n(1/3)² = 1/9\n5⁰ = 1\n2⁻³ = 1/8' }},
+
+  { id:'d_pgcd', type:'leaf', parent:'defs', x:-65, y:960, label:['PGCD','(définition)'], color:'#A78BFA', r:41,
+    d:{ title:'PGCD — Définition', type:'Définition',
+        formula:'pgcd(a,b) = plus grand\nentier divisant a et b',
+        rule:'pgcd(a,b) = 1\n→ a et b sont premiers\n   entre eux.',
+        desc:'Le Plus Grand Commun Diviseur de deux entiers a et b est le plus grand entier qui divise simultanément a et b. Sert à simplifier une fraction à sa forme irréductible.',
+        ex:'pgcd(12, 18) :\ndiviseurs de 12 : 1,2,3,4,6,12\ndiviseurs de 18 : 1,2,3,6,9,18\n→ pgcd = 6' }},
+
+  { id:'d_ppcm', type:'leaf', parent:'defs', x:100, y:1045, label:['PPCM','(définition)'], color:'#A78BFA', r:41,
+    d:{ title:'PPCM — Définition', type:'Définition',
+        formula:'ppcm(a,b) = plus petit\nmultiple commun à a et b',
+        rule:'ppcm(a,b) = a×b / pgcd(a,b)\nToujours ≥ max(a,b).',
+        desc:'Le Plus Petit Commun Multiple est le plus petit entier strictement positif qui est à la fois multiple de a et de b. C\'est le dénominateur commun minimal pour additionner deux fractions.',
+        ex:'ppcm(4, 6) :\nmultiples de 4 : 4,8,12,16…\nmultiples de 6 : 6,12,18…\n→ ppcm = 12' }},
+
+  { id:'d_decomp', type:'leaf', parent:'defs', x:-160, y:1020, label:['Décomp.','en nb premiers'], color:'#A78BFA', r:41,
+    d:{ title:'Décomposition en Nb Premiers — Déf.', type:'Définition',
+        formula:'Tout entier n > 1\n= produit de premiers\n(unique à l\'ordre près)',
+        rule:'Méthode : diviser par 2, 3, 5, 7…\njusqu\'à quotient = 1.\nUnicité garantie (th. fondamental).',
+        desc:'Le théorème fondamental de l\'arithmétique garantit qu\'il existe une seule façon d\'écrire un entier n > 1 comme produit de facteurs premiers (à l\'ordre des facteurs près). Base de toute simplification.',
+        ex:'12 = 2² × 3\n30 = 2 × 3 × 5\n100 = 2² × 5²\n\nUnicité : 12 ne peut\ns\'écrire autrement' }},
+
+  // ── RACINES leaf ────────────────────────────────────────
+  { id:'t12', type:'leaf', parent:'racines', x:895, y:1048, label:['Type 12'], short:'√(a²/b²)', color:'#06B6D4', r:41,
+    d:{ title:'Type 12 — Racine d\'une Fraction', type:'Racines de fractions',
+        formula:'√(a²/b²) = √(a²)/√(b²)\n         = |a|/|b|',
+        rule:'La racine s\'applique séparément\nau numérateur et au dénominateur.',
+        desc:'Appliquer √ à chaque partie de la fraction, calculer les racines des carrés (valeurs absolues), puis simplifier la fraction obtenue.',
+        ex:'√(36/16)\n= √36 / √16\n= 6/4\npgcd(6,4)=2\n= 3/2' }},
+];
+
+// ── EDGES ──────────────────────────────────────────────────
+const EDGES = [
+  // root → categories
+  { f:'root', t:'ops',      w:2.5 },
+  { f:'root', t:'nested',   w:2.5 },
+  { f:'root', t:'powers',   w:2.5 },
+  { f:'root', t:'priority', w:2.5 },
+  { f:'root', t:'simplify', w:2.5 },
+  { f:'root', t:'racines',  w:2.5 },
+  { f:'root', t:'defs',     w:2.5 },
+  // defs cat → leaves
+  { f:'defs', t:'d_frac' }, { f:'defs', t:'d_nbp' }, { f:'defs', t:'d_puiss' },
+  { f:'defs', t:'d_pgcd' }, { f:'defs', t:'d_ppcm' }, { f:'defs', t:'d_decomp' },
+  // ops → leaves
+  { f:'ops', t:'t4' }, { f:'ops', t:'t3' }, { f:'ops', t:'t8' },
+  // nested → leaves
+  { f:'nested', t:'t1' }, { f:'nested', t:'t6' },
+  // powers → leaves
+  { f:'powers', t:'t2' }, { f:'powers', t:'t9' }, { f:'powers', t:'t7' },
+  { f:'powers', t:'t13' }, { f:'powers', t:'t5' },
+  // priority → leaves
+  { f:'priority', t:'t10' }, { f:'priority', t:'t11' }, { f:'priority', t:'t14' },
+  // simplify → leaves
+  { f:'simplify', t:'pgcd' }, { f:'simplify', t:'ppcm' }, { f:'simplify', t:'irred' },
+  { f:'simplify', t:'decomp' }, { f:'simplify', t:'decomp_pow' },
+  // racines → leaf
+  { f:'racines', t:'t12' },
+  // ── Liens transversaux ────────────────────────────────
+  { f:'t3',   t:'t1',   dash:true },   // division → fraction composée
+  { f:'t2',   t:'t9',   dash:true },   // puissance positive ↔ négative
+  { f:'t5',   t:'t13',  dash:true },   // div même base ↔ prod même base
+  { f:'pgcd', t:'irred',       dash:true },   // PGCD → irréductibilité
+  { f:'ppcm', t:'t4',          dash:true },   // PPCM → addition
+  { f:'ppcm', t:'t8',          dash:true },   // PPCM → somme d'inverses
+  { f:'decomp', t:'pgcd',      dash:true },   // décomposition → PGCD
+  { f:'decomp', t:'ppcm',      dash:true },   // décomposition → PPCM
+  { f:'decomp_pow', t:'decomp',dash:true },   // décomp. avec puissances → décomp. simple
+  { f:'decomp_pow', t:'pgcd',  dash:true },   // décomp. avec puissances → PGCD
+  { f:'t14',  t:'t11',        dash:true },   // soustraction puis ÷  ↔  parenthèses puis ×
+  // ── Liens Définitions → branches ────────────────────────
+  { f:'d_frac',   t:'ops',       dash:true },   // fraction → opérations fondamentales
+  { f:'d_frac',   t:'nested',    dash:true },   // fraction → fractions imbriquées
+  { f:'d_nbp',    t:'decomp',    dash:true },   // nb premier → décomposition en premiers
+  { f:'d_nbp',    t:'decomp_pow',dash:true },   // nb premier → décomposition avec puissances
+  { f:'d_puiss',  t:'powers',    dash:true },   // puissance → catégorie puissances
+  { f:'d_puiss',  t:'t2',        dash:true },   // puissance → type 2 (a/b)ⁿ
+  { f:'d_pgcd',   t:'pgcd',      dash:true },   // def PGCD → outil PGCD
+  { f:'d_pgcd',   t:'irred',     dash:true },   // def PGCD → irréductibilité
+  { f:'d_ppcm',   t:'ppcm',      dash:true },   // def PPCM → outil PPCM
+  { f:'d_ppcm',   t:'t4',        dash:true },   // def PPCM → type 4 (addition)
+  { f:'d_decomp', t:'decomp',    dash:true },   // def décomp → outil décomp en premiers
+  { f:'d_decomp', t:'decomp_pow',dash:true },   // def décomp → décomp avec puissances
+];
+
+// ═══════════════════════════════════════════════════════════
+// RENDER ENGINE
+// ═══════════════════════════════════════════════════════════
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('map');
+let T = { x:0, y:0, s:1 };
+let dragging = false, ds = null;
+let selId = null;
+
+function el(tag, a={}) {
+  const e = document.createElementNS(NS, tag);
+  for(const [k,v] of Object.entries(a)) e.setAttribute(k, v);
+  return e;
+}
+function byId(id) { return NODES.find(n=>n.id===id); }
+
+function buildMap() {
+  svg.innerHTML = '';
+  const defs = el('defs');
+
+  // root gradient
+  const rg = el('radialGradient',{id:'rg',cx:'38%',cy:'33%',r:'65%'});
+  [[0,'#e8c86a'],[100,'#96760f']].forEach(([o,c])=>{
+    rg.appendChild(el('stop',{offset:`${o}%`,'stop-color':c}));
+  });
+  defs.appendChild(rg);
+  svg.appendChild(defs);
+
+  const G = el('g',{id:'g'});
+  svg.appendChild(G);
+  applyT();
+
+  const EG = el('g'); G.appendChild(EG);
+  const NG = el('g'); G.appendChild(NG);
+
+  for(const e of EDGES) {
+    const A = byId(e.f), B = byId(e.t);
+    if(!A||!B) continue;
+    const color = e.dash ? '#3a4a70' : (A.color||'#4a566e');
+    EG.appendChild(el('path',{
+      d: qcurve(A.x,A.y,B.x,B.y),
+      fill:'none', stroke:color,
+      'stroke-width': e.w||1.4,
+      'stroke-opacity': e.dash ? 0.5 : 0.38,
+      'stroke-dasharray': e.dash ? '7 5' : 'none',
+    }));
+  }
+
+  for(const n of NODES) drawNode(NG, n);
+}
+
+function qcurve(x1,y1,x2,y2) {
+  const mx=(x1+x2)/2, my=(y1+y2)/2;
+  return `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`;
+}
+
+function drawNode(parent, n) {
+  const g = el('g',{'data-id':n.id});
+  g.style.cursor = 'pointer';
+
+  const isRoot = n.type==='root';
+  const isLeaf = n.type==='leaf';
+  const r = n.r;
+
+  // glow ring
+  let gring;
+  if(isLeaf) {
+    const w=r*2+6, h=r*1.35;
+    gring = el('rect',{x:-(w/2+7), y:-(h/2+7), width:w+14, height:h+14, rx:13, fill:'none', stroke:n.color,'stroke-width':2,'stroke-opacity':0,class:'gring'});
+  } else {
+    gring = el('circle',{r:r+10, fill:'none', stroke:n.color,'stroke-width':2.5,'stroke-opacity':0,class:'gring'});
+  }
+  g.appendChild(gring);
+
+  // bg shape
+  let bg;
+  if(isLeaf) {
+    const w=r*2+6, h=r*1.35;
+    bg = el('rect',{x:-w/2, y:-h/2, width:w, height:h, rx:8,
+      fill:n.color,'fill-opacity':0.12, stroke:n.color,'stroke-width':1.4, class:'bg'});
+  } else {
+    bg = el('circle',{r:r,
+      fill:isRoot?'url(#rg)':n.color,
+      'fill-opacity':isRoot?1:0.15,
+      stroke:n.color,'stroke-width':isRoot?3:2.2, class:'bg'});
+  }
+  g.appendChild(bg);
+
+  // label
+  const lines = n.label;
+  const lh = isRoot ? 17.5 : (isLeaf ? 12 : 14);
+  const sy = -(lh*(lines.length-1))/2 - (n.sub?lh*0.5:0) - (n.short?lh*0.5:0);
+
+  lines.forEach((line,i)=>{
+    const t = el('text',{
+      x:0, y:sy+i*lh,
+      'text-anchor':'middle','dominant-baseline':'middle',
+      fill:isRoot?'#1a1205':'#e4dfc8',
+      'font-family':"'Crimson Pro',Georgia,serif",
+      'font-size':isRoot?16.5:(isLeaf?12:13),
+      'font-weight':isRoot?600:(isLeaf?400:600),
+    });
+    t.textContent = line;
+    g.appendChild(t);
+  });
+
+  if(n.sub) {
+    const t = el('text',{x:0, y:sy+lines.length*lh+2, 'text-anchor':'middle','dominant-baseline':'middle',
+      fill:isRoot?'#5a420e':'#6a7590','font-family':"'Fira Code',monospace",'font-size':7.5});
+    t.textContent = n.sub; g.appendChild(t);
+  }
+  if(n.short) {
+    const t = el('text',{x:0, y:sy+lines.length*lh+(n.sub?lh:3),
+      'text-anchor':'middle','dominant-baseline':'middle',
+      fill:n.color,'font-family':"'Fira Code',monospace",'font-size':8,'font-weight':500});
+    t.textContent = n.short; g.appendChild(t);
+  }
+
+  g.setAttribute('transform',`translate(${n.x},${n.y})`);
+
+  g.addEventListener('mouseenter',()=>{
+    bg.setAttribute('fill-opacity', isRoot?1:(isLeaf?0.28:0.32));
+    g.querySelector('.gring')?.setAttribute('stroke-opacity',0.38);
+  });
+  g.addEventListener('mouseleave',()=>{
+    if(selId===n.id) return;
+    bg.setAttribute('fill-opacity', isRoot?1:(isLeaf?0.12:0.15));
+    g.querySelector('.gring')?.setAttribute('stroke-opacity',0);
+  });
+  g.addEventListener('click',e=>{e.stopPropagation(); select(n.id);});
+  parent.appendChild(g);
+}
+
+// ═══════════════════════════════════════════════════════════
+// SELECTION & PANEL
+// ═══════════════════════════════════════════════════════════
+function select(id) {
+  deselect();
+  selId = id;
+  const n = byId(id);
+  const el2 = document.querySelector(`[data-id="${id}"]`);
+  el2?.querySelector('.bg')?.setAttribute('fill-opacity', n.type==='root'?1:0.45);
+  el2?.querySelector('.gring')?.setAttribute('stroke-opacity',0.65);
+  showPanel(n);
+}
+function deselect() {
+  if(!selId) return;
+  const n = byId(selId);
+  const el2 = document.querySelector(`[data-id="${selId}"]`);
+  el2?.querySelector('.bg')?.setAttribute('fill-opacity', n?.type==='root'?1:(n?.type==='leaf'?0.12:0.15));
+  el2?.querySelector('.gring')?.setAttribute('stroke-opacity',0);
+  selId = null;
+}
+function showPanel(n) {
+  const d = n.d;
+  document.getElementById('pBar').style.background = n.color;
+  document.getElementById('pTitle').textContent = d.title;
+  document.getElementById('pType').textContent = d.type;
+  document.getElementById('pType').style.color = n.color;
+
+  let html = '';
+  if(d.formula) html += `<div><div class="p-sec-label">Formule</div>
+    <div class="p-formula">${d.formula}</div></div>`;
+  if(d.rule) html += `<div><div class="p-sec-label">Règle à retenir</div>
+    <div class="p-rule">${d.rule}</div></div>`;
+  if(d.desc) html += `<div><div class="p-sec-label">Explication</div>
+    <div class="p-desc">${d.desc}</div></div>`;
+  if(d.ex) html += `<div><div class="p-sec-label">Exemple</div>
+    <div class="p-example" style="border-color:${n.color}">${d.ex}</div></div>`;
+
+  document.getElementById('pBody').innerHTML = html;
+  document.getElementById('panel').classList.add('open');
+}
+function closePanel() {
+  deselect();
+  document.getElementById('panel').classList.remove('open');
+}
+document.getElementById('pClose').addEventListener('click', closePanel);
+document.getElementById('map-wrap').addEventListener('click', closePanel);
+
+// ═══════════════════════════════════════════════════════════
+// ZOOM / PAN
+// ═══════════════════════════════════════════════════════════
+function applyT() {
+  const g = document.getElementById('g');
+  if(g) g.setAttribute('transform',`translate(${T.x},${T.y}) scale(${T.s})`);
+}
+function center() {
+  const c = document.getElementById('map-wrap');
+  const cw=c.clientWidth, ch=c.clientHeight;
+  const mapW=2350, mapH=1130;
+  const s = Math.min(cw/mapW, ch/mapH)*0.89;
+  // shift right by 200px (in map coords) to expose negative-x area
+  T = { x:(cw-mapW*s)/2 + 180*s, y:(ch-mapH*s)/2 + 10*s, s };
+  applyT();
+}
+document.getElementById('map-wrap').addEventListener('wheel',e=>{
+  e.preventDefault();
+  const rect=document.getElementById('map-wrap').getBoundingClientRect();
+  const mx=e.clientX-rect.left, my=e.clientY-rect.top;
+  const d=e.deltaY>0?0.88:1.12;
+  const ns=Math.max(0.2,Math.min(5,T.s*d));
+  T.x=mx-(mx-T.x)*(ns/T.s); T.y=my-(my-T.y)*(ns/T.s); T.s=ns; applyT();
+},{passive:false});
+
+document.getElementById('map-wrap').addEventListener('mousedown',e=>{
+  if(e.button===0){ dragging=true; ds={x:e.clientX-T.x,y:e.clientY-T.y}; }
+});
+document.addEventListener('mousemove',e=>{ if(dragging){T.x=e.clientX-ds.x;T.y=e.clientY-ds.y;applyT();} });
+document.addEventListener('mouseup',()=>{ dragging=false; });
+
+let ltd=null;
+document.getElementById('map-wrap').addEventListener('touchstart',e=>{
+  if(e.touches.length===1){dragging=true;ds={x:e.touches[0].clientX-T.x,y:e.touches[0].clientY-T.y};}
+  if(e.touches.length===2) ltd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+},{passive:true});
+document.getElementById('map-wrap').addEventListener('touchmove',e=>{
+  if(e.touches.length===1&&dragging){T.x=e.touches[0].clientX-ds.x;T.y=e.touches[0].clientY-ds.y;applyT();}
+  if(e.touches.length===2&&ltd){const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);T.s=Math.max(0.2,Math.min(5,T.s*d/ltd));ltd=d;applyT();}
+},{passive:true});
+document.getElementById('map-wrap').addEventListener('touchend',()=>{dragging=false;ltd=null;});
+
+document.getElementById('zIn').addEventListener('click',()=>{
+  const c=document.getElementById('map-wrap');
+  const cx=c.clientWidth/2,cy=c.clientHeight/2;
+  const ns=Math.min(5,T.s*1.25);
+  T.x=cx-(cx-T.x)*(ns/T.s);T.y=cy-(cy-T.y)*(ns/T.s);T.s=ns;applyT();
+});
+document.getElementById('zOut').addEventListener('click',()=>{
+  const c=document.getElementById('map-wrap');
+  const cx=c.clientWidth/2,cy=c.clientHeight/2;
+  const ns=Math.max(0.2,T.s*0.8);
+  T.x=cx-(cx-T.x)*(ns/T.s);T.y=cy-(cy-T.y)*(ns/T.s);T.s=ns;applyT();
+});
+document.getElementById('zReset').addEventListener('click',center);
+
+// INIT
+buildMap();
+window.addEventListener('resize',center);
+setTimeout(center,60);
+</script>
+</body>
+</html>

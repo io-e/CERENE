@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multiplication de fractions</title>
+<style>
+  :root {
+    --color-background-primary: #ffffff;
+    --color-background-secondary: #f5f4ef;
+    --color-background-tertiary: #eeede8;
+    --color-text-primary: #1a1a18;
+    --color-text-secondary: #5f5e5a;
+    --color-text-tertiary: #888780;
+    --color-border-primary: rgba(0,0,0,0.4);
+    --color-border-secondary: rgba(0,0,0,0.3);
+    --color-border-tertiary: rgba(0,0,0,0.15);
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --font-sans: system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) { :root {
+    --color-background-primary: #1e1e1c;
+    --color-background-secondary: #2a2a27;
+    --color-background-tertiary: #333330;
+    --color-text-primary: #e8e6de;
+    --color-text-secondary: #9c9a92;
+    --color-text-tertiary: #6e6d67;
+    --color-border-primary: rgba(255,255,255,0.4);
+    --color-border-secondary: rgba(255,255,255,0.3);
+    --color-border-tertiary: rgba(255,255,255,0.15);
+  }}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    background: var(--color-background-tertiary);
+    min-height: 100vh;
+    padding: 2rem 1rem;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    background: var(--color-background-primary);
+    border-radius: var(--border-radius-lg);
+    border: 0.5px solid var(--color-border-tertiary);
+    padding: 2rem;
+  }
+  .sheet { display: flex; flex-direction: column; gap: 1.25rem; }
+
+  /* ── Saisie ── */
+  .input-row { display:flex; align-items:center; justify-content:center; gap:20px; flex-wrap:wrap; }
+  .input-row input {
+    width:75px; text-align:center; font-size:22px; font-weight:500;
+    border:0.5px solid var(--color-border-secondary); border-radius:8px;
+    padding:4px 8px; background:var(--color-background-primary); color:var(--color-text-primary);
+  }
+  .frac-sep { width:90px; height:2px; background:var(--color-text-primary); }
+  .frac-stack { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .operator { font-size:28px; font-weight:500; color:var(--color-text-secondary); }
+  .btn {
+    padding:9px 22px; border-radius:8px; border:0.5px solid var(--color-border-secondary);
+    background:var(--color-background-secondary); color:var(--color-text-primary);
+    font-size:15px; font-weight:500; cursor:pointer; margin-left:20px;
+  }
+  .btn:hover { background:var(--color-background-tertiary); }
+  .btn:active { transform:scale(.97); }
+
+  /* ── Légende ── */
+  .legend { display:flex; gap:14px; flex-wrap:wrap; font-size:14px; color:var(--color-text-secondary); justify-content:center; }
+  .ldot { width:14px; height:14px; border-radius:3px; display:inline-block; vertical-align:middle; margin-right:4px; }
+
+  /* ── Décompositions 4 colonnes ── */
+  .dcols { display:grid; grid-template-columns:repeat(auto-fit, minmax(175px, 1fr)); gap:1rem; }
+  .dbox { border:0.5px solid var(--color-border-tertiary); border-radius:10px; padding:.85rem 1rem; }
+  .dtitle { font-size:15px; font-weight:500; color:var(--color-text-secondary); margin-bottom:.75rem; text-align:center; }
+  .potence { border-collapse:collapse; margin:0 auto; font-size:16px; }
+  .potence td { padding:2px 8px; color:var(--color-text-primary); line-height:1.4; }
+  .potence td.q { text-align:right; min-width:40px; border-right:2px solid var(--color-text-primary); }
+  .potence td.d { padding-left:12px; color:var(--color-text-secondary); }
+  .potence tr:first-child td.d { border-bottom:2px solid var(--color-text-primary); }
+  .potence tr.end td.q { color:var(--color-text-tertiary); font-style:italic; }
+  .dresult { margin-top:.65rem; font-size:14px; color:var(--color-text-secondary); text-align:center; }
+
+  /* ── Badges ── */
+  .badge { border-radius:6px; padding:2px 9px; font-size:16px; font-weight:700; display:inline-block; }
+  /* barré = simplifié entre num et den */
+  .fc { background:#FBEAF0; color:#993556; border:1.5px solid #993556; text-decoration:line-through; opacity:.7; }
+  /* conservé au numérateur */
+  .fn { background:#E6F1FB; color:#185FA5; border:1.5px solid #185FA5; }
+  /* conservé au dénominateur */
+  .fd { background:#EAF3DE; color:#3B6D11; border:1.5px solid #3B6D11; }
+
+  /* ── Section calcul ── */
+  .calc-section {
+    border:0.5px solid var(--color-border-tertiary); border-radius:10px;
+    padding:.9rem 1rem; display:flex; flex-direction:column; gap:1.5rem;
+  }
+  .calc-label { font-size:14px; font-weight:500; color:var(--color-text-secondary); }
+
+  /* ── Étape ── */
+  .calc-step {
+    display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+    font-size:20px; justify-content:center;
+  }
+
+  /* ── Fraction bloc ── */
+  .frac-part { display:flex; flex-direction:column; align-items:center; gap:2px; }
+  .frac-num {
+    border-bottom:2px solid var(--color-text-primary); padding-bottom:4px;
+    display:flex; gap:7px; align-items:center; flex-wrap:wrap;
+    justify-content:center; min-height:32px; min-width:40px;
+  }
+  .frac-den {
+    padding-top:4px; display:flex; gap:7px; align-items:center;
+    flex-wrap:wrap; justify-content:center; min-height:32px; min-width:40px;
+  }
+  .times { color:var(--color-text-tertiary); font-size:15px; }
+  .eq-sign { color:var(--color-text-tertiary); font-size:20px; }
+  .mult-sign { color:var(--color-text-primary); font-size:24px; font-weight:500; }
+
+  .note { font-size:13px; color:var(--color-text-tertiary); font-style:italic; }
+  .simpbadge { display:inline-block; background:#FFF3CD; border:1px solid #E6A817; color:#7A5800; border-radius:6px; padding:2px 10px; font-size:14px; font-weight:500; }
+
+  /* ── Divider ── */
+  .divider { border:none; border-top:0.5px solid var(--color-border-tertiary); margin:0; }
+
+  /* ── Réponse ── */
+  .ansrow { display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .anslabel { font-size:15px; font-weight:500; color:var(--color-text-secondary); }
+  .ansbox {
+    border:2px dashed var(--color-border-secondary); border-radius:10px;
+    padding:.75rem 1.75rem; min-width:150px; min-height:72px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:28px; font-weight:500; color:var(--color-text-tertiary);
+    cursor:text; outline:none;
+  }
+  .ansbox:focus { border-color:var(--color-border-primary); }
+  .empty { text-align:center; color:var(--color-text-tertiary); font-size:14px; padding:.4rem 0; }
+</style>
+</head>
+<body>
+<div class="page"><div class="sheet">
+
+  <!-- ── Saisie ── -->
+  <div class="input-row">
+    <div class="frac-stack">
+      <input type="number" id="n1" value="15" min="1" max="9999">
+      <div class="frac-sep"></div>
+      <input type="number" id="d1" value="14" min="1" max="9999">
+    </div>
+    <div class="operator">×</div>
+    <div class="frac-stack">
+      <input type="number" id="n2" value="21" min="1" max="9999">
+      <div class="frac-sep"></div>
+      <input type="number" id="d2" value="10" min="1" max="9999">
+    </div>
+    <button class="btn" onclick="compute()">Calculer ↗</button>
+  </div>
+
+  <!-- ── Légende ── -->
+  <div class="legend" id="legend" style="display:none">
+    <span><span class="ldot" style="background:#E6F1FB;border:1.5px solid #185FA5"></span>Conservé au numérateur</span>
+    <span><span class="ldot" style="background:#EAF3DE;border:1.5px solid #3B6D11"></span>Conservé au dénominateur</span>
+    <span><span class="ldot" style="background:#FBEAF0;border:1.5px solid #993556;text-decoration:line-through"></span>Simplifié (croisement num/den)</span>
+  </div>
+
+  <!-- ── Décompositions 4 termes ── -->
+  <div class="dcols" id="dcols">
+    <div class="dbox"><div class="empty">—</div></div>
+    <div class="dbox"><div class="empty">—</div></div>
+    <div class="dbox"><div class="empty">—</div></div>
+    <div class="dbox"><div class="empty">—</div></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Calcul ── -->
+  <div class="calc-section" id="calc-section" style="display:none">
+    <div class="calc-label">Calcul de la multiplication</div>
+    <div id="calcsteps"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Réponse ── -->
+  <div class="ansrow">
+    <div class="anslabel">Résultat simplifié :</div>
+    <div class="ansbox" contenteditable="true" spellcheck="false" id="answer"></div>
+  </div>
+
+</div></div>
+
+<script>
+/* ── Utilitaires ── */
+function pf(n) {
+  if (n <= 1) return { s: [], f: [1] };
+  const s = [], f = []; let div = 2;
+  while (n > 1) {
+    if (n % div === 0) { s.push([n, div]); f.push(div); n = Math.floor(n / div); }
+    else div++;
+  }
+  return { s, f };
+}
+
+/* ── Table potence ── */
+function potence(steps) {
+  if (!steps.length) return '<div class="note" style="text-align:center;padding:6px">1</div>';
+  let h = '<table class="potence">';
+  steps.forEach(([q, dv], i) => {
+    h += `<tr${i === steps.length - 1 ? ' class="end"' : ''}><td class="q">${q}</td><td class="d">${dv}</td></tr>`;
+  });
+  return h + '<tr class="end"><td class="q">1</td><td class="d"></td></tr></table>';
+}
+
+/* ── Fraction bloc ── */
+function frac(num, den) {
+  return `<div class="frac-part"><div class="frac-num">${num}</div><div class="frac-den">${den}</div></div>`;
+}
+
+const EQ = '<span class="eq-sign"> = </span>';
+const T  = '<span class="times"> × </span>';
+const MU = '<span class="mult-sign"> × </span>';
+
+/* ── Calcul principal ── */
+function compute() {
+  const n1 = parseInt(document.getElementById('n1').value) || 15;
+  const d1 = parseInt(document.getElementById('d1').value) || 14;
+  const n2 = parseInt(document.getElementById('n2').value) || 21;
+  const d2 = parseInt(document.getElementById('d2').value) || 10;
+
+  const N1 = pf(n1), D1 = pf(d1), N2 = pf(n2), D2 = pf(d2);
+
+  /* ── Décompositions ── */
+  const buildBox = (title, val, data) => `
+    <div class="dbox">
+      <div class="dtitle">${title} = ${val}</div>
+      ${potence(data.s)}
+      <div class="dresult">${val} = ${data.f.join(' × ')}</div>
+    </div>`;
+
+  document.getElementById('dcols').innerHTML =
+    buildBox('Numérateur 1', n1, N1) +
+    buildBox('Dénominateur 1', d1, D1) +
+    buildBox('Numérateur 2', n2, N2) +
+    buildBox('Dénominateur 2', d2, D2);
+
+  /* ── Simplification croisée : tous les num vs tous les den ── */
+  let topFactors = [...N1.f, ...N2.f].filter(x => x !== 1);
+  let botFactors = [...D1.f, ...D2.f].filter(x => x !== 1);
+  if (!topFactors.length) topFactors = [1];
+  if (!botFactors.length) botFactors = [1];
+
+  const topUsed = new Array(topFactors.length).fill(false);
+  const botUsed = new Array(botFactors.length).fill(false);
+
+  for (let i = 0; i < topFactors.length; i++) {
+    const matchIdx = botFactors.findIndex((v, j) => v === topFactors[i] && !botUsed[j]);
+    if (matchIdx !== -1) { topUsed[i] = true; botUsed[matchIdx] = true; }
+  }
+
+  let finalNum = 1, finalDen = 1;
+  const topHtml = topFactors.map((f, i) => {
+    if (topUsed[i]) return `<span class="badge fc">${f}</span>`;
+    finalNum *= f;
+    return `<span class="badge fn">${f}</span>`;
+  });
+  const botHtml = botFactors.map((f, i) => {
+    if (botUsed[i]) return `<span class="badge fc">${f}</span>`;
+    finalDen *= f;
+    return `<span class="badge fd">${f}</span>`;
+  });
+
+  const simplified = topUsed.some(v => v); // au moins une simplification ?
+
+  /* ── Étapes ── */
+  let steps = '';
+
+  // Étape 1 : écriture du produit num × num / den × den
+  steps += `<div class="calc-step">
+    ${frac(n1, d1)} ${MU} ${frac(n2, d2)}
+    ${EQ}
+    ${frac(`${n1} ${T} ${n2}`, `${d1} ${T} ${d2}`)}
+  </div>`;
+
+  // Étape 2 : décomposition avec badges (simplification croisée)
+  steps += `<div class="calc-step">
+    ${EQ}
+    ${frac(topHtml.join(T), botHtml.join(T))}
+    ${simplified ? '<span class="note">(simplification croisée num/den)</span>' : '<span class="note">(aucune simplification possible)</span>'}
+  </div>`;
+
+  // Étape 3 : résultat
+  if (finalDen === 1) {
+    steps += `<div class="calc-step">
+      ${EQ}
+      <span style="font-size:26px;font-weight:600">${finalNum}</span>
+      <span class="simpbadge">résultat entier</span>
+    </div>`;
+  } else {
+    steps += `<div class="calc-step">
+      ${EQ}
+      <div class="frac-part">
+        <div class="frac-num" style="font-weight:600">${finalNum}</div>
+        <div class="frac-den" style="font-weight:600">${finalDen}</div>
+      </div>
+    </div>`;
+  }
+
+  document.getElementById('calcsteps').innerHTML = steps;
+  document.getElementById('calc-section').style.display = 'flex';
+  document.getElementById('legend').style.display = 'flex';
+  document.getElementById('answer').innerText = '';
+  document.getElementById('answer').focus();
+}
+
+compute();
+</script>
+</body>
+</html>
