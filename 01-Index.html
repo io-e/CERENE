@@ -1,0 +1,1813 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Correction Professeur — Puzzles Géométriques (Figures 1–10)</title>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" id="MathJax-script" async></script>
+<script>window.MathJax = {tex: {inlineMath: [['\\(','\\)']]}, svg: {fontCache: 'global'}};</script>
+<style>
+:root {
+  --bleu: #3464A3; --bleuC: #D2E4F7; --rouge: #B43C32; --rose: #F8D2CF;
+  --vert: #3C8C50; --vertC: #D2F0D7; --orange: #C86414; --orangeC: #FCE4C3;
+  --fond: #F4F5F8; --texte: #1A1A2E; --gris: #6B7280;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--fond);
+       color: var(--texte); font-size: 15px; line-height: 1.6; }
+.page-header { background: var(--bleu); color: white; padding: 24px 32px;
+               border-bottom: 4px solid #1e3a5f; }
+.page-header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 4px; }
+.page-header p { opacity: .85; font-size: .95rem; }
+.badge { display: inline-block; background: rgba(255,255,255,.2);
+         border-radius: 20px; padding: 2px 12px; font-size:.85rem; margin-top:6px; }
+
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 16px; }
+
+/* ─── Accordion ─── */
+.accordion-item { background: white; border-radius: 10px; margin-bottom: 14px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,.08); overflow: hidden; }
+.accordion-btn { width: 100%; display: flex; align-items: center; gap: 14px;
+                 background: white; border: none; padding: 16px 20px; cursor: pointer;
+                 border-left: 5px solid var(--bleu); transition: background .2s; text-align:left; }
+.accordion-btn:hover { background: var(--bleuC); }
+.accordion-btn.open { background: var(--bleuC); border-left-color: var(--vert); }
+.acc-num { width: 34px; height: 34px; background: var(--bleu); color: white;
+           border-radius: 50%; display: flex; align-items: center; justify-content: center;
+           font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+.acc-title { font-size: 1.1rem; font-weight: 600; color: var(--bleu); flex: 1; }
+.acc-arrow { color: var(--bleu); font-size: .9rem; transition: transform .25s; }
+.accordion-btn.open .acc-arrow { transform: rotate(180deg); }
+.accordion-content { border-top: 1px solid #e5e9f0; }
+
+/* ─── Figure body ─── */
+.fig-meta { background: #f0f3f8; padding: 10px 20px; font-size: .9rem;
+             color: var(--gris); border-bottom: 1px solid #e5e9f0; font-style: italic; }
+.fig-columns { display: flex; gap: 0; }
+.fig-problem { flex-shrink: 0; padding: 20px; border-right: 1px solid #e5e9f0;
+               display: flex; align-items: flex-start; justify-content: center;
+               min-width: 380px; background: #fafbfd; }
+.fig-sections { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+
+@media (max-width: 700px) {
+  .fig-columns { flex-direction: column; }
+  .fig-problem { border-right: none; border-bottom: 1px solid #e5e9f0; min-width: 0; }
+}
+
+/* ─── Problem SVG panel ─── */
+.problem-panel { max-width: 360px; }
+.problem-panel svg { max-width: 100%; height: auto; }
+
+/* ─── Collapsible sections ─── */
+.sec-wrap { border-radius: 8px; overflow: hidden; border: 1.5px solid #e0e4ec; }
+.sec-btn { width: 100%; display: flex; align-items: center; gap: 10px;
+           padding: 10px 14px; border: none; cursor: pointer; font-size: .95rem;
+           font-weight: 600; transition: filter .15s; text-align: left; }
+.sec-btn:hover { filter: brightness(.95); }
+.sec-icon { font-size: .75rem; transition: transform .2s; }
+.sec-btn.open .sec-icon { transform: rotate(90deg); }
+
+.btn-vert { background: var(--vertC); color: var(--vert); }
+.btn-rouge { background: var(--rose); color: var(--rouge); }
+.btn-orange { background: var(--orangeC); color: var(--orange); }
+.sec-content { padding: 14px 16px; background: white; border-top: 1px solid #e0e4ec; }
+
+/* ─── Correction box ─── */
+.corr-box { background: #f0faf3; border-left: 4px solid var(--vert);
+             border-radius: 0 6px 6px 0; padding: 14px 18px; }
+.corr-box p { margin-bottom: 8px; }
+.corr-box ul { margin: 6px 0 8px 20px; }
+.formula { text-align: center; margin: 12px 0 !important; font-size: 1.05rem; }
+.note { font-size: .88rem; color: var(--bleu); font-style: italic; margin-top: 8px !important; }
+.warn { font-size: .88rem; color: var(--rouge); font-weight: 600; margin-top: 8px !important; }
+
+/* ─── GeoGebra bar ─── */
+.ggb-bar {
+  display: flex; align-items: center; gap: 9px;
+  background: linear-gradient(135deg, #eef4fb 0%, #ddeaf8 100%);
+  border-top: 2px solid #5487C2;
+  border-radius: 0 0 8px 8px;
+  padding: 9px 12px;
+  flex-wrap: wrap;
+}
+.ggb-icon { flex-shrink: 0; display: flex; align-items: center; }
+.ggb-label { font-size: .82rem; color: #3464A3; font-weight: 600; flex: 1; min-width: 100px; }
+.ggb-btn {
+  background: #5487C2; color: white; border: none;
+  border-radius: 6px; padding: 6px 14px;
+  font-size: .83rem; font-weight: 700; cursor: pointer;
+  transition: background .2s, transform .1s;
+  white-space: nowrap;
+}
+.ggb-btn:hover { background: #3464A3; transform: translateY(-1px); }
+.ggb-btn:active { transform: translateY(0); }
+.ggb-btn-browser {
+  background: white; color: #3464A3;
+  border: 2px solid #5487C2;
+  border-radius: 6px; padding: 5px 12px;
+  font-size: .83rem; font-weight: 700; cursor: pointer;
+  transition: background .2s, transform .1s;
+  white-space: nowrap;
+}
+.ggb-btn-browser:hover { background: #eef4fb; transform: translateY(-1px); }
+.ggb-btn-browser:active { transform: translateY(0); }
+.ggb-btns { display: flex; gap: 7px; align-items: center; }
+.ggb-filename { font-size: .78rem; color: #6B7280; font-family: monospace;
+                 background: rgba(255,255,255,.7); padding: 2px 7px;
+                 border-radius: 4px; border: 1px solid #c5d5eb; }
+.ggb-toast {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  background: #1e3a5f; color: white; padding: 10px 22px; border-radius: 8px;
+  font-size: .9rem; z-index: 9999; opacity: 0;
+  transition: opacity .3s; pointer-events: none; max-width: 90vw; text-align: center;
+}
+.ggb-toast.show { opacity: 1; }
+
+/* ─── Error table ─── */
+.err-table-wrap { overflow-x: auto; }
+.err-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.err-table th { background: #e8ecf5; color: var(--bleu); padding: 8px 10px;
+                 text-align: left; border-bottom: 2px solid var(--bleu); }
+.err-table td { padding: 8px 10px; border-bottom: 1px solid #eef0f5; vertical-align: top; }
+.err-table tr:last-child td { border-bottom: none; }
+.err-num { color: var(--rouge); font-weight: 700; text-align: center; width: 36px; }
+.err-exo { color: var(--orange); font-weight: 600; white-space: nowrap; text-align: center; width: 60px; }
+.err-desc { width: 35%; }
+.err-rem { color: #374151; }
+.err-table tr:nth-child(even) td { background: #fafbfd; }
+
+/* ─── Exercice boxes ─── */
+.exo-box { border: 1.5px solid var(--orangeC); border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.exo-header { background: var(--orangeC); padding: 8px 14px;
+               display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.exo-title { font-weight: 700; color: var(--orange); font-size: .95rem; }
+.exo-tags { font-size: .8rem; color: #6B5120; background: rgba(200,100,20,.15);
+             padding: 2px 8px; border-radius: 12px; }
+.exo-body { display: flex; gap: 0; }
+.exo-left { flex: 1; padding: 14px 16px; }
+.exo-left p { margin-bottom: 8px; }
+.exo-left table { margin: 8px 0; }
+.exo-right { flex-shrink: 0; padding: 12px; display: flex; align-items: center;
+              justify-content: center; border-left: 1px solid var(--orangeC);
+              background: #fffdf9; min-width: 200px; }
+.exo-right svg { max-width: 100%; height: auto; }
+
+@media (max-width: 600px) {
+  .exo-body { flex-direction: column; }
+  .exo-right { border-left: none; border-top: 1px solid var(--orangeC); min-width: 0; }
+}
+
+/* ─── Mini table ─── */
+.mini-table { border-collapse: collapse; font-size: .88rem; margin: 6px 0 10px; }
+.mini-table th, .mini-table td { border: 1px solid #d0d5e0; padding: 5px 10px; }
+.mini-table th { background: #e8ecf5; color: var(--bleu); }
+.mini-table tr:nth-child(even) td { background: #f5f7fb; }
+
+/* ─── Print styles ─── */
+@media print {
+  .page-header { break-after: avoid; }
+  .accordion-item { break-inside: avoid; }
+  .accordion-btn { background: white !important; }
+  .accordion-content { display: block !important; }
+  .sec-content { display: block !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>📐 Correction Professeur — Puzzles Géométriques</h1>
+  <p>Calcul des aires — Figures 1 à 10</p>
+  <span class="badge">Niveau 3e</span>
+  <span class="badge" style="margin-left:8px">10 figures · Erreurs attendues · Exercices de remédiation</span>
+</div>
+
+<div class="container">
+
+<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;">
+  <button onclick="openAll()" style="background:var(--bleu);color:white;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-weight:600;">
+    ▼ Tout déplier
+  </button>
+  <button onclick="closeAll()" style="background:white;color:var(--bleu);border:2px solid var(--bleu);padding:8px 18px;border-radius:6px;cursor:pointer;font-weight:600;">
+    ▲ Tout replier
+  </button>
+  <div style="margin-left:auto;font-size:.85rem;color:var(--gris);align-self:center;">
+    Cliquer sur une figure pour l'ouvrir · Cliquer sur ✓ / ⚠ / ✏ pour révéler chaque section
+  </div>
+</div>
+
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">1</span>
+<span class="acc-title">Le rectangle de départ</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Formule : \(\mathcal{A} = L \times l\)</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#FDFCF9" stroke="#DDD9D0" stroke-width="1.5" id="rect7" />
+    <rect width="350" height="34" fill="#243A5E" id="rect8" />
+    <circle cx="20" cy="17" r="11" fill="#C9943A" id="circle8" />
+    <text x="20" y="17" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" dominant-baseline="middle" id="text8">1</text>
+    <text x="38" y="17" font-family="Georgia,serif" font-size="12" font-weight="bold" fill="#fff" dominant-baseline="middle" id="text9">Le rectangle de départ</text>
+    <rect y="34" width="350" height="186" fill="#FAFAF7" id="rect9" />
+    
+    <rect x="95" y="62" width="160" height="100" fill="#FDECEA" stroke="#243A5E" stroke-width="2" id="rect10" />
+    <text x="175" y="112" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#B83228" text-anchor="middle" dominant-baseline="middle" id="text10">?</text>
+    
+    <line x1="95" y1="174" x2="255" y2="174" stroke="#243A5E" stroke-width="1.5" id="line10" />
+    <line x1="95" y1="169" x2="95" y2="179" stroke="#243A5E" stroke-width="1.5" id="line11" />
+    <line x1="255" y1="169" x2="255" y2="179" stroke="#243A5E" stroke-width="1.5" id="line12" />
+    <text x="175" y="191" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" id="text12">5 cm</text>
+    
+    <line x1="83" y1="62" x2="83" y2="162" stroke="#243A5E" stroke-width="1.5" id="line13" />
+    <line x1="78" y1="62" x2="88" y2="62" stroke="#243A5E" stroke-width="1.5" id="line14" />
+    <line x1="78" y1="162" x2="88" y2="162" stroke="#243A5E" stroke-width="1.5" id="line15" />
+    <text x="68" y="112" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,68,112)" id="text15">4 cm</text>
+    <line x1="10" y1="221" x2="340" y2="221" stroke="#DDD9D0" stroke-width="1" id="line16" />
+    <text x="15" y="235" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text16">Ce rectangle a une largeur de 5 cm et une hauteur de 4 cm.</text>
+    <text x="15" y="251" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text17">Quelle est son aire ?</text>
+    <line x1="10" y1="268" x2="340" y2="268" stroke="#C9943A" stroke-width="0.8" stroke-dasharray="4,3" id="line17" />
+    <text x="15" y="282" font-family="Georgia,serif" font-size="10.5" fill="#1D6640" font-style="italic" id="text18">Solution : 5 × 4 = 20 cm²</text>
+    <text x="15" y="298" font-family="Georgia,serif" font-size="9.5" fill="#8A8070" font-style="italic" id="text19">L'aire d'un rectangle = longueur × largeur.</text>
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle01.ggb')"
+            title="Ouvre 90puzzle01.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle01.ggb')"
+            title="Ouvre 90puzzle01.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle01.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s1')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s1" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Identification :</strong> Longueur \(L = 5\) cm &nbsp;·&nbsp; Largeur \(l = 4\) cm</p>
+<p class="formula">$$\mathcal{A} = L \times l = 5 \times 4 = \boxed{20 \text{ cm}^2}$$</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s2')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s2" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Calcule le périmètre : 5+4+5+4 = <strong>18 cm</strong> (ou 5+4=9)</td>
+<td class="err-exo">R1a</td>
+<td class="err-rem">Distinguer périmètre (contour, en cm) et aire (surface, en cm²). Compter les carreaux sur quadrillage.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Ne fait que 5+4 = <strong>9</strong> sans unité claire</td>
+<td class="err-exo">R1a</td>
+<td class="err-rem">L'aire c'est une multiplication, pas une addition.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">Applique la formule du triangle : ½×5×4 = <strong>10 cm²</strong></td>
+<td class="err-exo">R1b</td>
+<td class="err-rem">Revoir quand s'applique chaque formule. Le triangle est la moitié d'un rectangle ; ici la figure est un rectangle complet.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s3')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s3" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R1a — Périmètre ou aire ?</span> <span class="exo-tags">[E1, E2]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Un carrelage rectangle <strong>6 cm × 3 cm</strong>.</p><p><strong>a)</strong> Calcule son <strong>périmètre</strong> (en cm).</p><p><strong>b)</strong> Calcule son <strong>aire</strong> (en cm²).</p><p><strong>c)</strong> Complète : «&nbsp;Le périmètre se calcule avec ___ et ___. L'aire se calcule avec ___ et ___.&nbsp;»</p></div>
+<div class="exo-right"><svg width="308" height="184" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="40" y="20" width="228" height="114" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><line x1="78" y1="20" x2="78" y2="134" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="116" y1="20" x2="116" y2="134" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="154" y1="20" x2="154" y2="134" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="192" y1="20" x2="192" y2="134" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="230" y1="20" x2="230" y2="134" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="40" y1="58" x2="268" y2="58" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><line x1="40" y1="96" x2="268" y2="96" stroke="#D2E4F7" stroke-width="0.8" opacity="0.6"/><path d="M40,152 L268,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M50,148 L40,152 L50,156" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M258,148 L268,152 L258,156" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="154.0" y="149" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6 cm</text><path d="M22,20 L22,134" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M18,30 L22,20 L26,30" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M18,124 L22,134 L26,124" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="14" y="77.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">3 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R1b — Rectangle ou triangle ?</span> <span class="exo-tags">[E3]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Pour chaque figure, entoure la bonne formule et calcule l'aire.</p><p><strong>Fig A</strong> : rectangle 7 cm × 2 cm<br>Formule : \(L×l\) ou \(\frac{1}{2}×b×h\) ?<br>Aire = ______</p><p><strong>Fig B</strong> : triangle rectangle base 7 cm, hauteur 2 cm<br>Formule : \(L×l\) ou \(\frac{1}{2}×b×h\) ?<br>Aire = ______</p></div>
+<div class="exo-right"><svg width="290" height="210" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="75" width="210" height="60" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="140" y="105" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Fig A</text><path d="M35,145 L245,145" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M45,141 L35,145 L45,149" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M235,141 L245,145 L235,149" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="140.0" y="142" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">7 cm</text><path d="M253,75 L253,135" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M249,85 L253,75 L257,85" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M249,125 L253,135 L257,125" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="268" y="105.0" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">2 cm</text><polygon points="35,15 245,15 245,75" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h5801" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="35" y="15" width="210" height="60" fill="url(#h5801)" stroke="#3464A3" stroke-width="0"/><polygon points="35,15 245,15 245,75" fill="url(#none)" stroke="#3464A3" stroke-width="2"/><polyline points="237,75 237,83 245,83" fill="none" stroke="#3464A3" stroke-width="1.5"/><text x="125" y="45" fill="#B43C32" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Fig B</text><path d="M35,3 L245,3" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M45,-1 L35,3 L45,7" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M235,-1 L245,3 L235,7" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="140.0" y="18" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">7 cm</text><path d="M253,15 L253,75" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M249,25 L253,15 L257,25" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M249,65 L253,75 L257,65" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="268" y="45.0" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">2 cm</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">2</span>
+<span class="acc-title">Le rectangle caché</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : trouver h par division, puis calculer l'aire inconnue</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#FDFCF9" stroke="#DDD9D0" stroke-width="1.5" id="rect19" />
+    <rect width="350" height="34" fill="#243A5E" id="rect20" />
+    <circle cx="20" cy="17" r="11" fill="#C9943A" id="circle20" />
+    <text x="20" y="17" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" dominant-baseline="middle" id="text20">2</text>
+    <text x="38" y="17" font-family="Georgia,serif" font-size="12" font-weight="bold" fill="#fff" dominant-baseline="middle" id="text21">Le rectangle caché</text>
+    <rect y="34" width="350" height="186" fill="#FAFAF7" id="rect21" />
+    
+    <rect x="62" y="67" width="80" height="100" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect22" />
+    <text x="102" y="117" font-family="Georgia,serif" font-size="12" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text22">12 cm²</text>
+    
+    <rect x="142" y="67" width="107" height="100" fill="#FDECEA" stroke="#243A5E" stroke-width="2" id="rect23" />
+    <text x="195" y="117" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#B83228" text-anchor="middle" dominant-baseline="middle" id="text23">?</text>
+    
+    <line x1="257" y1="67" x2="257" y2="167" stroke="#8A8070" stroke-width="1" stroke-dasharray="3,3" id="line23" />
+    <text x="276" y="109" font-family="Georgia,serif" font-size="9" fill="#8A8070" text-anchor="middle" font-style="italic" id="text24">même</text>
+    <text x="276" y="121" font-family="Georgia,serif" font-size="9" fill="#8A8070" text-anchor="middle" font-style="italic" id="text25">hauteur</text>
+    
+    <line x1="62" y1="179" x2="142" y2="179" stroke="#243A5E" stroke-width="1.5" id="line25" />
+    <line x1="62" y1="174" x2="62" y2="184" stroke="#243A5E" stroke-width="1.5" id="line26" />
+    <line x1="142" y1="174" x2="142" y2="184" stroke="#243A5E" stroke-width="1.5" id="line27" />
+    <text x="102" y="196" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" id="text27">3 cm</text>
+    
+    <line x1="142" y1="179" x2="249" y2="179" stroke="#243A5E" stroke-width="1.5" id="line28" />
+    <line x1="249" y1="174" x2="249" y2="184" stroke="#243A5E" stroke-width="1.5" id="line29" />
+    <text x="195" y="196" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" id="text29">4 cm</text>
+    <line x1="10" y1="221" x2="340" y2="221" stroke="#DDD9D0" stroke-width="1" id="line30" />
+    <text x="15" y="235" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text30">Deux rectangles de même hauteur (inconnue). Gauche :</text>
+    <text x="15" y="251" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text31">largeur 3 cm, aire 12 cm². Droite : largeur 4 cm. Aire ?</text>
+    <line x1="10" y1="268" x2="340" y2="268" stroke="#C9943A" stroke-width="0.8" stroke-dasharray="4,3" id="line31" />
+    <text x="15" y="282" font-family="Georgia,serif" font-size="10.5" fill="#1D6640" font-style="italic" id="text32">Solution : hauteur = 12 ÷ 3 = 4 cm  →  4 × 4 = 16 cm²</text>
+    <text x="15" y="298" font-family="Georgia,serif" font-size="9.5" fill="#8A8070" font-style="italic" id="text33">La hauteur commune est implicite — elle se retrouve par division.</text>
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle02.ggb')"
+            title="Ouvre 90puzzle02.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle02.ggb')"
+            title="Ouvre 90puzzle02.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle02.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s4')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s4" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Identification de la hauteur commune :</strong></p>
+<p>Le rectangle gauche a une largeur de 3 cm et une aire de 12 cm².</p>
+<p class="formula">$$h = \mathcal{A}_{gauche} \div L_{gauche} = 12 \div 3 = \mathbf{4} \text{ cm}$$</p>
+<p class="formula">$$\mathcal{A}_{droit} = L_{droit} \times h = 4 \times 4 = \boxed{16 \text{ cm}^2}$$</p>
+<p class="note">La hauteur n'est pas donnée directement : elle se retrouve par division.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s5')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s5" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Répond directement <strong>4 cm</strong>, confond la cote avec l'aire cherchée</td>
+<td class="err-exo">R2a</td>
+<td class="err-rem">Distinguer : les dimensions sont sur les flèches, les aires sont à l'intérieur.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">12 + 4 = <strong>16 cm²</strong> <em>(résultat juste, raisonnement faux !)</em></td>
+<td class="err-exo">R2a</td>
+<td class="err-rem">Demander de justifier la hauteur commune. Changer les valeurs pour démasquer l'erreur.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">12 ÷ 4 = 3, puis 3×3 = <strong>9 cm²</strong> (mauvaise largeur)</td>
+<td class="err-exo">R2b</td>
+<td class="err-rem">Clarifier quel rectangle fournit les données connues.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">Bloqué : ne sait pas comment trouver la hauteur</td>
+<td class="err-exo">R2b</td>
+<td class="err-rem">Rappeler : \(h = \mathcal{A} \div L\). Exercice de « décodage » avant les figures composées.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s6')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s6" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R2a — Lire les étiquettes sur une figure</span> <span class="exo-tags">[E1, E2]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Deux rectangles côte à côte (18 cm² et ?).</p><p><strong>a)</strong> Quelle est la hauteur commune ?<br>\(h = \_\_\_ \div \_\_\_ = \_\_\_\) cm</p><p><strong>b)</strong> Calcule l'aire du rectangle droit (en vert).</p><p><strong>c)</strong> Si l'aire gauche était 20 cm² et la largeur 5 cm, quelle serait h ?</p></div>
+<div class="exo-right"><svg width="270" height="240" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="20" width="72" height="180" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="71" y="110" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">18 cm²</text><rect x="107" y="20" width="108" height="180" fill="#D2F0D7" stroke="#3C8C50" stroke-width="2"/><text x="161" y="110" fill="#B43C32" font-size="18" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M35,216 L107,216" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M45,212 L35,216 L45,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M97,212 L107,216 L97,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="71.0" y="213" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">2 cm</text><path d="M107,216 L215,216" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M117,212 L107,216 L117,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M205,212 L215,216 L205,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="161.0" y="213" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">3 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R2b — Retrouver une dimension par division</span> <span class="exo-tags">[E3, E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>On sait que \(\mathcal{A} = L \times h\), donc \(h = \mathcal{A} \div L\).</p><table class="mini-table"><tr><th>Aire</th><th>L</th><th>h = ?</th></tr><tr><td>24 cm²</td><td>4 cm</td><td>___</td></tr><tr><td>35 cm²</td><td>5 cm</td><td>___</td></tr><tr><td>30 cm²</td><td>6 cm</td><td>___</td></tr></table><p><strong>Puis :</strong> un rectangle a h=5 cm et L=7 cm. Quelle est son aire ?</p></div>
+<div class="exo-right"><svg width="254" height="260" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="40" width="144" height="180" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="107" y="130" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">24 cm²</text><path d="M35,236 L179,236" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M45,232 L35,236 L45,240" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M169,232 L179,236 L169,240" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="107.0" y="233" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">L = 4 cm</text><path d="M17,40 L17,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,50 L17,40 L21,50" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,210 L17,220 L21,210" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="130.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">h = ?</text><rect x="71" y="5" width="72" height="26" rx="4" fill="#FCE4C3" stroke="#C86414"/><text x="107" y="18" fill="#C86414" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">h = 24 ÷ 4 = 6 cm</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">3</span>
+<span class="acc-title">La rangée de trois</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : trouver h avec un rectangle, vérifier avec un autre, calculer le troisième</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#fdfcf9" stroke="#ddd9d0" stroke-width="1.5" id="rect33" x="0.0" y="0.0" />
+  <rect width="350" height="34" fill="#243a5e" id="rect34" x="0.0" y="0.0" />
+  <circle cx="20.0" cy="17.0" r="11" fill="#c9943a" id="circle34" />
+  <text x="20.0" y="17.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" id="text34">3</text>
+  <text x="38.0" y="17.0" font-family="Georgia, serif" font-size="12px" font-weight="bold" fill="#ffffff" dominant-baseline="middle" id="text35">La rangée de trois</text>
+  <rect y="34.0" width="350" height="186" fill="#fafaf7" id="rect35" x="0.0" />
+  <rect x="40.0" y="82.0" width="60" height="90" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect36" />
+  <text x="70.0" y="127.0" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text36">10 cm²</text>
+  <rect x="100.0" y="82.0" width="90" height="90" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect37" />
+  <text x="145.0" y="127.0" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text37">15 cm²</text>
+  <rect x="190.0" y="82.0" width="120" height="90" fill="#fdecea" stroke="#243a5e" stroke-width="2" id="rect38" />
+  <text x="250.0" y="127.0" font-family="Georgia, serif" font-size="16px" font-weight="bold" fill="#b83228" text-anchor="middle" dominant-baseline="middle" id="text38">?</text>
+  <line x1="40.0" y1="184.0" x2="310.0" y2="184.0" stroke="#243a5e" stroke-width="1.5" id="line38" />
+  <line x1="40.0" y1="179.0" x2="40.0" y2="189.0" stroke="#243a5e" stroke-width="1.5" id="line39" />
+  <line x1="190.0" y1="179.0" x2="190.0" y2="189.0" stroke="#243a5e" stroke-width="1.5" id="line41" />
+  <line x1="310.0" y1="179.0" x2="310.0" y2="189.0" stroke="#243a5e" stroke-width="1.5" id="line42" />
+  <text x="115.0" y="201.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text43">5 cm</text>
+  <text x="250.0" y="201.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text44">4 cm</text>
+  <line x1="10.0" y1="221.0" x2="340.0" y2="221.0" stroke="#ddd9d0" stroke-width="1" id="line44" />
+  <text x="15.0" y="235.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text45">3 rectangles, même hauteur inconnue. Largeurs : 2, 3, 4 cm.</text>
+  <text x="15.0" y="251.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text46">Aires du 1ᵉʳ et 2ᵉ : 10 et 15 cm². Trouver l'aire du 3ᵉ.</text>
+  <line x1="10.0" y1="268.0" x2="340.0" y2="268.0" stroke="#c9943a" stroke-width="0.8" stroke-dasharray="4, 3" id="line46" />
+  <text x="15.0" y="282.0" font-family="Georgia, serif" font-size="10.5px" fill="#1d6640" font-style="italic" id="text47">Solution : h = 10÷2 = 5 cm (vérif. 3×5=15 ✓) → 4×5 = 20 cm²</text>
+  <text x="15.0" y="298.0" font-family="Georgia, serif" font-size="9.5px" fill="#8a8070" font-style="italic" id="text48">Le 2ᵉ rectangle confirme la hauteur avant de calculer le 3ᵉ.</text>
+  
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle03.ggb')"
+            title="Ouvre 90puzzle03.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle03.ggb')"
+            title="Ouvre 90puzzle03.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle03.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s7')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s7" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Étape 1 — Trouver la hauteur commune :</strong></p>
+<p class="formula">$$h = 10 \div 2 = \mathbf{5} \text{ cm}$$</p>
+<p><strong>Vérification avec le 2e rectangle :</strong></p>
+<p class="formula">$$3 \times 5 = 15 \text{ cm}^2 \quad ✓$$</p>
+<p><strong>Étape 2 — Aire du 3e rectangle :</strong></p>
+<p class="formula">$$\mathcal{A} = 4 \times 5 = \boxed{20 \text{ cm}^2}$$</p>
+<p class="note">La vérification avec le 2e rectangle est essentielle : elle garantit que la hauteur est bien commune aux trois.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s8')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s8" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">10 + 15 = <strong>25 cm²</strong></td>
+<td class="err-exo">R3a</td>
+<td class="err-rem">Les aires servent à trouver h, pas à composer l'aire cherchée.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Prend h = 10 (l'aire !), puis 4×10 = <strong>40 cm²</strong></td>
+<td class="err-exo">R3a</td>
+<td class="err-rem">Rappeler les unités : hauteur en cm, pas en cm².</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">10 ÷ 3 = 3,33 cm (mauvaise largeur)</td>
+<td class="err-exo">R3b</td>
+<td class="err-rem">Distinguer quel rectangle fournit les deux données connues (aire ET largeur).</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">N'effectue pas la vérification</td>
+<td class="err-exo">R3b</td>
+<td class="err-rem">Institutionnaliser la vérification comme étape obligatoire.</td>
+</tr><tr>
+<td class="err-num">E5</td>
+<td class="err-desc">Additionne les largeurs 2+3+4=9, puis bloqué</td>
+<td class="err-exo">R3a</td>
+<td class="err-rem">L'aire de chaque rectangle = sa propre largeur × h commun. On ne fusionne pas les largeurs.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s9')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s9" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R3a — Trouver h et vérifier</span> <span class="exo-tags">[E1, E2, E5]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Trois rectangles, même hauteur inconnue. Largeurs : <strong>3, 4, 5 cm</strong>.</p><p>Aire du 1er : <strong>12 cm²</strong>. Aire du 2e : <strong>16 cm²</strong>.</p><p><strong>a)</strong> Calcule h à partir du 1er rectangle.</p><p><strong>b)</strong> Vérifie avec le 2e rectangle.</p><p><strong>c)</strong> Calcule l'aire du 3e.</p><p class="warn">Si b) ne confirme pas h, recommence !</p></div>
+<div class="exo-right"><svg width="416" height="182" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="30" y="20" width="84" height="112" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="72" y="76" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">12 cm²</text><rect x="114" y="20" width="112" height="112" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="170" y="76" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">16 cm²</text><rect x="226" y="20" width="140" height="112" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h4357" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="226" y="20" width="140" height="112" fill="url(#h4357)" stroke="#3464A3" stroke-width="0"/><text x="296" y="76" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M30,148 L114,148" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,144 L30,148 L40,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M104,144 L114,148 L104,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="72.0" y="145" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">3 cm</text><path d="M114,148 L226,148" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M124,144 L114,148 L124,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M216,144 L226,148 L216,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="170.0" y="145" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text><path d="M226,148 L366,148" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M236,144 L226,148 L236,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M356,144 L366,148 L356,152" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="296.0" y="145" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">5 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R3b — Choisir le bon rectangle pour h</span> <span class="exo-tags">[E3, E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Trois rectangles, même hauteur. Aires : 15, ?, 18 cm². Largeurs : 5, 4, 6 cm.</p><p><strong>a)</strong> Identifie le rectangle qui donne à la fois une aire et une largeur connues.</p><p><strong>b)</strong> Déduis h.</p><p><strong>c)</strong> Vérifie avec un autre rectangle.</p><p><strong>d)</strong> Calcule les aires manquantes.</p></div>
+<div class="exo-right"><svg width="530" height="160" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="30" y="20" width="150" height="90" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="105" y="65" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">15 cm²</text><rect x="180" y="20" width="120" height="90" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h8500" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="180" y="20" width="120" height="90" fill="url(#h8500)" stroke="#3464A3" stroke-width="0"/><text x="240" y="65" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><rect x="300" y="20" width="180" height="90" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="390" y="65" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">18 cm²</text><path d="M30,126 L180,126" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,122 L30,126 L40,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M170,122 L180,126 L170,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="105.0" y="123" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">5 cm</text><path d="M180,126 L300,126" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M190,122 L180,126 L190,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M290,122 L300,126 L290,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="240.0" y="123" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text><path d="M300,126 L480,126" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M310,122 L300,126 L310,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M470,122 L480,126 L470,130" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="390.0" y="123" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6 cm</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">4</span>
+<span class="acc-title">L'empilement</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : retrouver la largeur commune par division (orientation verticale)</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#FDFCF9" stroke="#DDD9D0" stroke-width="1.5" id="rect48" />
+    <rect width="350" height="34" fill="#243A5E" id="rect49" />
+    <circle cx="20" cy="17" r="11" fill="#C9943A" id="circle49" />
+    <text x="20" y="17" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" dominant-baseline="middle" id="text49">4</text>
+    <text x="38" y="17" font-family="Georgia,serif" font-size="12" font-weight="bold" fill="#fff" dominant-baseline="middle" id="text50">L'empilement</text>
+    <rect y="34" width="350" height="186" fill="#FAFAF7" id="rect50" />
+    
+    <rect x="100" y="50" width="150" height="66" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect51" />
+    <text x="175" y="83" font-family="Georgia,serif" font-size="12" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text51">18 cm²</text>
+    <rect x="100" y="116" width="150" height="88" fill="#FDECEA" stroke="#243A5E" stroke-width="2" id="rect52" />
+    <text x="175" y="160" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#B83228" text-anchor="middle" dominant-baseline="middle" id="text52">?</text>
+    
+    <line x1="88" y1="50" x2="88" y2="116" stroke="#243A5E" stroke-width="1.5" id="line52" />
+    <line x1="83" y1="50" x2="93" y2="50" stroke="#243A5E" stroke-width="1.5" id="line53" />
+    <line x1="83" y1="116" x2="93" y2="116" stroke="#243A5E" stroke-width="1.5" id="line54" />
+    <text x="73" y="83" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,73,83)" id="text54">3 cm</text>
+    
+    <line x1="88" y1="116" x2="88" y2="204" stroke="#243A5E" stroke-width="1.5" id="line55" />
+    <line x1="83" y1="204" x2="93" y2="204" stroke="#243A5E" stroke-width="1.5" id="line56" />
+    <text x="73" y="160" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,73,160)" id="text56">4 cm</text>
+    
+    <line x1="258" y1="50" x2="258" y2="204" stroke="#8A8070" stroke-width="1" stroke-dasharray="3,3" id="line57" />
+    <text x="278" y="121" font-family="Georgia,serif" font-size="9" fill="#8A8070" text-anchor="middle" font-style="italic" id="text57">même</text>
+    <text x="278" y="133" font-family="Georgia,serif" font-size="9" fill="#8A8070" text-anchor="middle" font-style="italic" id="text58">largeur</text>
+    <line x1="10" y1="221" x2="340" y2="221" stroke="#DDD9D0" stroke-width="1" id="line58" />
+    <text x="15" y="235" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text59">Deux rectangles empilés, même largeur (inconnue).</text>
+    <text x="15" y="251" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text60">Hauteurs : 3 cm (18 cm²) et 4 cm. Quelle est l'aire du 2ᵉ ?</text>
+    <line x1="10" y1="268" x2="340" y2="268" stroke="#C9943A" stroke-width="0.8" stroke-dasharray="4,3" id="line60" />
+    <text x="15" y="282" font-family="Georgia,serif" font-size="10.5" fill="#1D6640" font-style="italic" id="text61">Solution : largeur = 18 ÷ 3 = 6 cm  →  6 × 4 = 24 cm²</text>
+    <text x="15" y="298" font-family="Georgia,serif" font-size="9.5" fill="#8A8070" font-style="italic" id="text62">Même logique que l'étape 2, mais la dimension partagée est horizontale.</text>
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle04.ggb')"
+            title="Ouvre 90puzzle04.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle04.ggb')"
+            title="Ouvre 90puzzle04.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle04.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s10')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s10" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Identification de la largeur commune :</strong></p>
+<p>Le rectangle du haut a une hauteur de 3 cm et une aire de 18 cm².</p>
+<p class="formula">$$\ell = 18 \div 3 = \mathbf{6} \text{ cm}$$</p>
+<p class="formula">$$\mathcal{A}_{bas} = \ell \times h_{bas} = 6 \times 4 = \boxed{24 \text{ cm}^2}$$</p>
+<p class="note">Même logique que la figure 2, mais orientée verticalement : c'est la <strong>largeur</strong> qui est commune.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s11')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s11" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">18 ÷ 4 = 4,5 cm puis 4,5×3 = <strong>13,5 cm²</strong> (confond h et ℓ)</td>
+<td class="err-exo">R4a</td>
+<td class="err-rem">Faire tourner la figure de 90° : c'est la même situation que la figure 2.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">3+4 = 7, puis 18÷7 ≈ <strong>2,57</strong> (additionne les hauteurs)</td>
+<td class="err-exo">R4a</td>
+<td class="err-rem">Chaque rectangle a sa propre hauteur. Seule la largeur est partagée.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">4×3 = <strong>12 cm²</strong> (multiplie les deux hauteurs)</td>
+<td class="err-exo">R4a</td>
+<td class="err-rem">Il manque la largeur, qui est inconnue. On doit d'abord trouver ℓ.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">Répond <strong>18 cm²</strong> par analogie ou additionne sans méthode</td>
+<td class="err-exo">R4b</td>
+<td class="err-rem">Stratégie : «&nbsp;Aire ET hauteur du haut → je trouve ℓ.&nbsp;»</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s12')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s12" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R4a — La dimension commune change d'orientation</span> <span class="exo-tags">[E1, E2, E3]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Deux rectangles empilés, même <strong>largeur</strong> inconnue.</p><p>Rectangle du haut : hauteur <strong>2 cm</strong>, aire <strong>14 cm²</strong>.</p><p>Rectangle du bas : hauteur <strong>5 cm</strong>, aire ?</p><p><strong>a)</strong> Quelle dimension est commune ? ☐ hauteur &nbsp; ☐ largeur</p><p><strong>b)</strong> Retrouve la largeur : \(\ell = \_\_\_ \div \_\_\_ =\_\_\_\) cm</p><p><strong>c)</strong> Calcule l'aire du rectangle du bas.</p></div>
+<div class="exo-right"><svg width="300" height="270" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="20" width="210" height="60" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="140" y="50" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">14 cm²</text><rect x="35" y="80" width="210" height="150" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h1923" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="35" y="80" width="210" height="150" fill="url(#h1923)" stroke="#3464A3" stroke-width="0"/><text x="140" y="155" fill="#B43C32" font-size="18" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M17,20 L17,80" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,30 L17,20 L21,30" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,70 L17,80 L21,70" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="50.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">2 cm</text><path d="M17,80 L17,230" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,90 L17,80 L21,90" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,220 L17,230 L21,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="155.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">5 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R4b — Identifier les données avant de calculer</span> <span class="exo-tags">[E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><table class="mini-table"><tr><th></th><th>Aire</th><th>Hauteur</th><th>Largeur</th></tr><tr><td>Rect. haut</td><td>18 cm²</td><td>3 cm</td><td><strong>?</strong></td></tr><tr><td>Rect. bas</td><td><strong>?</strong></td><td>4 cm</td><td><strong>?</strong></td></tr></table><p><strong>a)</strong> Quelle case peut-on remplir en premier ? Justifie.</p><p><strong>b)</strong> Complète le tableau entièrement.</p><p><strong>c)</strong> En déduire l'aire du rectangle du bas.</p></div>
+<div class="exo-right"><svg width="270" height="270" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="20" width="180" height="90" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="125" y="65" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">18 cm²</text><rect x="35" y="110" width="180" height="120" fill="#D2F0D7" stroke="#3C8C50" stroke-width="2"/><text x="125" y="170" fill="#B43C32" font-size="18" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M17,20 L17,110" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,30 L17,20 L21,30" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,100 L17,110 L21,100" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="65.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">3 cm</text><path d="M17,110 L17,230" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,120 L17,110 L21,120" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,220 L17,230 L21,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="170.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">4 cm</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">5</span>
+<span class="acc-title">La figure en L</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : \(\mathcal{A}_{total} - \mathcal{A}_{retiré}\)</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#fdfcf9" stroke="#ddd9d0" stroke-width="1.5" id="rect62" x="0.0" y="0.0" />
+  <rect width="350" height="34" fill="#243a5e" id="rect63" x="0.0" y="0.0" />
+  <circle cx="20.0" cy="17.0" r="11" fill="#c9943a" id="circle63" />
+  <text x="20.0" y="17.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" id="text63">5</text>
+  <text x="38.0" y="17.0" font-family="Georgia, serif" font-size="12px" font-weight="bold" fill="#ffffff" dominant-baseline="middle" id="text64">La figure en L</text>
+  <rect y="34.0" width="350" height="186" fill="#fafaf7" id="rect64" x="0.0" />
+  <rect x="193.0" y="73.0" width="54" height="36" fill="#f4f1eb" stroke="#8a8070" stroke-width="1.5" stroke-dasharray="5, 3" id="rect65" />
+  <text x="220.0" y="91.0" font-family="Georgia, serif" font-size="8px" fill="#8a8070" text-anchor="middle" dominant-baseline="middle" id="text65">retiré</text>
+  <text x="175.0" y="130.0" font-family="Georgia, serif" font-size="16px" font-weight="bold" fill="#b83228" text-anchor="middle" dominant-baseline="middle" id="text66">?</text>
+  <line x1="103.0" y1="194.0" x2="247.0" y2="194.0" stroke="#243a5e" stroke-width="1.5" id="line66" />
+  <line x1="103.0" y1="189.0" x2="103.0" y2="199.0" stroke="#243a5e" stroke-width="1.5" id="line67" />
+  <line x1="247.0" y1="189.0" x2="247.0" y2="199.0" stroke="#243a5e" stroke-width="1.5" id="line68" />
+  <text x="175.0" y="210.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text68">8 cm</text>
+  <line x1="91.0" y1="73.0" x2="91.0" y2="181.0" stroke="#243a5e" stroke-width="1.5" id="line69" />
+  <line x1="86.0" y1="73.0" x2="96.0" y2="73.0" stroke="#243a5e" stroke-width="1.5" id="line70" />
+  <line x1="86.0" y1="181.0" x2="96.0" y2="181.0" stroke="#243a5e" stroke-width="1.5" id="line71" />
+  <line x1="193.0" y1="61.0" x2="247.0" y2="61.0" stroke="#243a5e" stroke-width="1.5" id="line72" />
+  <line x1="193.0" y1="56.0" x2="193.0" y2="66.0" stroke="#243a5e" stroke-width="1.5" id="line73" />
+  <line x1="247.0" y1="56.0" x2="247.0" y2="66.0" stroke="#243a5e" stroke-width="1.5" id="line74" />
+  <text x="220.0" y="49.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text74">3 cm</text>
+  <line x1="260.0" y1="73.0" x2="260.0" y2="109.0" stroke="#243a5e" stroke-width="1.5" id="line75" />
+  <line x1="255.0" y1="73.0" x2="265.0" y2="73.0" stroke="#243a5e" stroke-width="1.5" id="line76" />
+  <line x1="255.0" y1="109.0" x2="265.0" y2="109.0" stroke="#243a5e" stroke-width="1.5" id="line77" />
+  <line x1="10.0" y1="221.0" x2="340.0" y2="221.0" stroke="#ddd9d0" stroke-width="1" id="line78" />
+  <text x="15.0" y="235.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text78">Figure en L : rectangle 8×6 cm amputé d'un coin de 3×2 cm.</text>
+  <text x="15.0" y="251.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text79">Quelle est l'aire de la figure en L ?</text>
+  <line x1="10.0" y1="268.0" x2="340.0" y2="268.0" stroke="#c9943a" stroke-width="0.8" stroke-dasharray="4, 3" id="line79" />
+  <text x="15.0" y="282.0" font-family="Georgia, serif" font-size="10.5px" fill="#1d6640" font-style="italic" id="text80">Solution : (8×6) − (3×2) = 48 − 6 = 42 cm²</text>
+  <text x="15.0" y="298.0" font-family="Georgia, serif" font-size="9.5px" fill="#8a8070" font-style="italic" id="text81">Calculer le tout, puis soustraire la partie retirée.</text>
+  
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle05.ggb')"
+            title="Ouvre 90puzzle05.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle05.ggb')"
+            title="Ouvre 90puzzle05.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle05.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s13')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s13" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Stratégie — encadrement par soustraction :</strong></p>
+<ul>
+<li>Aire du rectangle englobant : \(8 \times 6 = 48\) cm²</li>
+<li>Aire du coin retiré : \(3 \times 2 = 6\) cm²</li>
+</ul>
+<p class="formula">$$\mathcal{A}_{L} = 48 - 6 = \boxed{42 \text{ cm}^2}$$</p>
+<p class="note">On «&nbsp;complète&nbsp;» la figure en un grand rectangle, puis on soustrait la partie manquante.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s14')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s14" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">8×6 = <strong>48 cm²</strong> (oublie de soustraire)</td>
+<td class="err-exo">R5a</td>
+<td class="err-rem">Colorier la partie réelle en bleu et la partie manquante en rouge.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Décompose en 2 rects mais dimensions fragiles → <strong>42 cm²</strong> <em>(résultat juste, méthode fragile)</em></td>
+<td class="err-exo">R5a</td>
+<td class="err-rem">Valider en vérifiant que les deux méthodes (addition et soustraction) donnent 42 cm².</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">8+6+3+2 = <strong>19</strong> (calcule le périmètre)</td>
+<td class="err-exo">R5b</td>
+<td class="err-rem">Refaire la distinction périmètre/aire sur la figure en L.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">(8−3)×(6−2) = 5×4 = <strong>20 cm²</strong> (soustrait des longueurs)</td>
+<td class="err-exo">R5b</td>
+<td class="err-rem">La soustraction porte sur les <strong>aires</strong>, pas sur les côtés.</td>
+</tr><tr>
+<td class="err-num">E5</td>
+<td class="err-desc">48 − 3 = <strong>45</strong> (soustrait une longueur au lieu d'une aire)</td>
+<td class="err-exo">R5a</td>
+<td class="err-rem">Le coin retiré est un rectangle ; son aire = 3×2.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s15')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s15" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R5a — Visualiser la soustraction d'aires</span> <span class="exo-tags">[E1, E2, E5]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Rectangle 7×5 cm amputé d'un coin de 2×3 cm.</p><p><strong>a)</strong> Colorie en <span style="color:#3464A3;font-weight:bold">bleu</span> la partie réelle, en <span style="color:#B43C32;font-weight:bold">rouge</span> la partie retirée.</p><p><strong>b)</strong> Calcule l'aire du grand rectangle.</p><p><strong>c)</strong> Calcule l'aire du coin retiré.</p><p><strong>d)</strong> Déduis l'aire de la figure en L.</p></div>
+<div class="exo-right"><svg width="314" height="240" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><polygon points="35,185 259,185 259,89 99,89 99,25 35,25" fill="#D2E4F7" stroke="#3464A3" stroke-width="2.5"/><rect x="99" y="25" width="160" height="64" fill="#F8D2CF" stroke="#B43C32" stroke-width="1.5"/><defs><pattern id="h2464" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="99" y="25" width="160" height="64" fill="url(#h2464)" stroke="#3464A3" stroke-width="0"/><rect x="99" y="25" width="160" height="64" fill="none" stroke="#B43C32" stroke-width="1.5" stroke-dasharray="5,3"/><path d="M35,201 L259,201" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M45,197 L35,201 L45,205" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M249,197 L259,201 L249,205" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="147.0" y="198" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">7 cm</text><path d="M17,25 L17,185" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M13,35 L17,25 L21,35" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M13,175 L17,185 L21,175" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="9" y="105.0" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">5 cm</text><path d="M99,11 L259,11" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M109,7 L99,11 L109,15" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M249,7 L259,11 L249,15" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="179.0" y="8" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">2 cm</text><path d="M271,25 L271,89" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M267,35 L271,25 L275,35" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M267,79 L271,89 L275,79" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="286" y="57.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">3 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R5b — Périmètre vs aire sur figure en L</span> <span class="exo-tags">[E3, E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Figure en L : grand rectangle 6×4 cm, coin retiré 1×2 cm.</p><p><strong>a)</strong> Calcule le <strong>périmètre</strong> de la figure en L. <em>(Attention : compte tous les côtés.)</em></p><p><strong>b)</strong> Calcule l'<strong>aire</strong> de la figure en L.</p><p><strong>c)</strong> Complète : «&nbsp;Le périmètre est en ___, l'aire est en ___².&nbsp;»</p><p class="warn">L'aire ne se calcule jamais en soustrayant des longueurs !</p></div>
+<div class="exo-right"><svg width="294" height="216" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><polygon points="35,161 239,161 239,93 69,93 69,25 35,25" fill="#D2E4F7" stroke="#3464A3" stroke-width="2.5"/><rect x="69" y="25" width="170" height="68" fill="#F8D2CF" stroke="#B43C32" stroke-width="1.5"/><defs><pattern id="h837" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="69" y="25" width="170" height="68" fill="url(#h837)" stroke="#3464A3" stroke-width="0"/><rect x="69" y="25" width="170" height="68" fill="none" stroke="#B43C32" stroke-width="1.5" stroke-dasharray="5,3"/><path d="M35,177 L239,177" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M45,173 L35,177 L45,181" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M229,173 L239,177 L229,181" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="137.0" y="174" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6 cm</text><path d="M17,25 L17,161" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M13,35 L17,25 L21,35" stroke="#3464A3" stroke-width="1.5" fill="none"/><path d="M13,151 L17,161 L21,151" stroke="#3464A3" stroke-width="1.5" fill="none"/><text x="9" y="93.0" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">4 cm</text><path d="M69,11 L239,11" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M79,7 L69,11 L79,15" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M229,7 L239,11 L229,15" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="154.0" y="8" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">1 cm</text><path d="M251,25 L251,93" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M247,35 L251,25 L255,35" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M247,83 L251,93 L255,83" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="266" y="59.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">2 cm</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">6</span>
+<span class="acc-title">La grille 2×2</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : déverrouiller les dimensions cachées dans l'ordre logique</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#FDFCF9" stroke="#DDD9D0" stroke-width="1.5" id="rect81" />
+    <rect width="350" height="34" fill="#243A5E" id="rect82" />
+    <circle cx="20" cy="17" r="11" fill="#C9943A" id="circle82" />
+    <text x="20" y="17" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" dominant-baseline="middle" id="text82">6</text>
+    <text x="38" y="17" font-family="Georgia,serif" font-size="12" font-weight="bold" fill="#fff" dominant-baseline="middle" id="text83">La grille 2×2 guidée</text>
+    <rect y="34" width="350" height="186" fill="#FAFAF7" id="rect83" />
+    
+    <rect x="120" y="39" width="44" height="66" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect84" />
+    <text x="142" y="72" font-family="Georgia,serif" font-size="10" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text84">6 cm²</text>
+    <rect x="164" y="39" width="66" height="66" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect85" />
+    <text x="197" y="72" font-family="Georgia,serif" font-size="10" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text85">9 cm²</text>
+    <rect x="120" y="105" width="44" height="110" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect86" />
+    <text x="142" y="160" font-family="Georgia,serif" font-size="10" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text86">10 cm²</text>
+    <rect x="164" y="105" width="66" height="110" fill="#FDECEA" stroke="#243A5E" stroke-width="2" id="rect87" />
+    <text x="197" y="160" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#B83228" text-anchor="middle" dominant-baseline="middle" id="text87">?</text>
+    
+    <line x1="248" y1="39" x2="248" y2="105" stroke="#243A5E" stroke-width="1.5" id="line87" />
+    <line x1="243" y1="39" x2="253" y2="39" stroke="#243A5E" stroke-width="1.5" id="line88" />
+    <line x1="243" y1="105" x2="253" y2="105" stroke="#243A5E" stroke-width="1.5" id="line89" />
+    <text x="264" y="72" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,264,72)" id="text89">3 cm</text>
+    <line x1="10" y1="221" x2="340" y2="221" stroke="#DDD9D0" stroke-width="1" id="line90" />
+    <text x="15" y="235" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text90">Grille 2×2. Hauteur rangée du haut : 3 cm. Aires connues :</text>
+    <text x="15" y="251" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text91">6, 9 et 10 cm². Trouver l'aire du 4ᵉ rectangle.</text>
+    <line x1="10" y1="268" x2="340" y2="268" stroke="#C9943A" stroke-width="0.8" stroke-dasharray="4,3" id="line91" />
+    <text x="15" y="282" font-family="Georgia,serif" font-size="10.5" fill="#1D6640" font-style="italic" id="text92">Solution : w=2, w=3 cm, h=5 cm  →  3 × 5 = 15 cm²</text>
+    <text x="15" y="298" font-family="Georgia,serif" font-size="9.5" fill="#8A8070" font-style="italic" id="text93">Chaque aire connue déverrouille une dimension cachée.</text>
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle06.ggb')"
+            title="Ouvre 90puzzle06.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle06.ggb')"
+            title="Ouvre 90puzzle06.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle06.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s16')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s16" class="sec-content" style="display:none">
+<div class="corr-box"><p>Hauteur de la rangée du haut connue : \(h_1 = 3\) cm.</p>
+<p><strong>(1)</strong> Largeur colonne gauche :<br>\(w_1 = 6 \div 3 = \mathbf{2}\) cm</p>
+<p><strong>(2)</strong> Largeur colonne droite :<br>\(w_2 = 9 \div 3 = \mathbf{3}\) cm</p>
+<p><strong>(3)</strong> Hauteur rangée bas (via rect. C) :<br>\(h_2 = 10 \div 2 = \mathbf{5}\) cm</p>
+<p><strong>(4)</strong> Aire du rectangle D :</p>
+<p class="formula">$$\mathcal{A}_D = w_2 \times h_2 = 3 \times 5 = \boxed{15 \text{ cm}^2}$$</p>
+<p class="note">Chaque aire connue «&nbsp;déverrouille&nbsp;» une dimension → raisonnement en cascade.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s17')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s17" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Bloqué dès le départ : ne sait pas par où commencer</td>
+<td class="err-exo">R6a</td>
+<td class="err-rem">La seule entrée est h₁=3 cm (donnée explicite). Chercher la case avec une aire ET une dimension connues.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Inverse lignes et colonnes : cherche w₁ = 6 ÷ h₂ (non encore trouvée)</td>
+<td class="err-exo">R6a</td>
+<td class="err-rem">Flèche rouge sur la ligne connue, bleue sur la colonne. Résoudre dans l'ordre obligatoire.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">6+9+10 = <strong>25 cm²</strong> ou 10+9−6 = <strong>13 cm²</strong></td>
+<td class="err-exo">R6b</td>
+<td class="err-rem">Aucune relation additive directe. Revenir à \(\mathcal{A}=L\times h\) pour chaque case.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">h₂ = 9÷3 = 3 cm (prend la mauvaise colonne)</td>
+<td class="err-exo">R6b</td>
+<td class="err-rem">h₂ est la hauteur de toute la rangée du bas ; elle se retrouve via le rect. C et w₁.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s18')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s18" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R6a — Trouver la case de départ</span> <span class="exo-tags">[E1, E2]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Grille 2×2, largeur colonne droite = <strong>4 cm</strong>.</p><p>Aires : A=8 cm², B=12 cm², C=20 cm².</p><p><strong>a)</strong> Quelle dimension est connue dès le départ ?<br>☐ h rangée haut &nbsp; ☐ largeur col. gauche &nbsp; ☐ largeur col. droite &nbsp; ☐ h rangée bas</p><p><strong>b)</strong> Trouve h₁, puis w₁.</p><p><strong>c)</strong> Trouve h₂, puis l'aire D.</p></div>
+<div class="exo-right"><svg width="300" height="250" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="20" width="90" height="60" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="80" y="50" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">A=8</text><rect x="125" y="20" width="120" height="60" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="185" y="50" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">B=12</text><rect x="35" y="80" width="90" height="120" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="80" y="140" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">C=20</text><rect x="125" y="80" width="120" height="120" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h2788" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="125" y="80" width="120" height="120" fill="url(#h2788)" stroke="#3464A3" stroke-width="0"/><text x="185" y="140" fill="#B43C32" font-size="14" font-weight="bold" text-anchor="middle" dominant-baseline="middle">D=?</text><path d="M125,216 L245,216" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M135,212 L125,216 L135,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M235,212 L245,216 L235,220" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="185.0" y="213" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text><text x="80" y="8" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">w₁=?</text><text x="185" y="8" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R6b — Raisonnement en cascade, pas d'addition</span> <span class="exo-tags">[E3, E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><table class="mini-table"><tr><th></th><th>Col. gauche (w₁)</th><th>Col. droite (w₂)</th></tr><tr><td>Rang. haut (h₁=3)</td><td>A=6 cm²</td><td>B=9 cm²</td></tr><tr><td>Rang. bas (h₂=?)</td><td>C=10 cm²</td><td>D=?</td></tr></table><p>(1) \(w_1 = 6 \div \_\_ = \_\_\) cm</p><p>(2) \(w_2 = 9 \div \_\_ = \_\_\) cm</p><p>(3) \(h_2 = 10 \div \_\_ = \_\_\) cm</p><p>(4) \(D = \_\_ \times \_\_ = \_\_\) cm²</p></div>
+<div class="exo-right"><svg width="230" height="284" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto"><path d="M1,1 L7,4 L1,7 Z" fill="#C86414"/></marker></defs><rect x="35" y="20" width="56" height="84" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="63" y="62" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6</text><rect x="91" y="20" width="84" height="84" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="133" y="62" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">9</text><rect x="35" y="104" width="56" height="140" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="63" y="174" fill="#3464A3" font-size="13" font-weight="bold" text-anchor="middle" dominant-baseline="middle">10</text><rect x="91" y="104" width="84" height="140" fill="#D2F0D7" stroke="#3C8C50" stroke-width="2"/><text x="133" y="174" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M17,20 L17,104" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,30 L17,20 L21,30" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M13,94 L17,104 L21,94" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="9" y="62.0" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="end" dominant-baseline="middle">3 cm</text><line x1="63" y1="96" x2="63" y2="166" stroke="#C86414" stroke-width="2" marker-end="url(#arr)"/><line x1="133" y1="96" x2="133" y2="166" stroke="#C86414" stroke-width="2" marker-end="url(#arr)"/></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">7</span>
+<span class="acc-title">Le prolongement en L</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : la hauteur du grand rectangle est implicitement celle du petit</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#FDFCF9" stroke="#DDD9D0" stroke-width="1.5" id="rect93" />
+    <rect width="350" height="34" fill="#243A5E" id="rect94" />
+    <circle cx="20" cy="17" r="11" fill="#C9943A" id="circle94" />
+    <text x="20" y="17" font-family="Georgia,serif" font-size="13" font-weight="bold" fill="#fff" text-anchor="middle" dominant-baseline="middle" id="text94">7</text>
+    <text x="38" y="17" font-family="Georgia,serif" font-size="12" font-weight="bold" fill="#fff" dominant-baseline="middle" id="text95">Le prolongement en L</text>
+    <rect y="34" width="350" height="186" fill="#FAFAF7" id="rect95" />
+    
+    <rect x="126" y="62" width="98" height="42" fill="#E4EBF5" stroke="#243A5E" stroke-width="2" id="rect96" />
+    <text x="175" y="83" font-family="Georgia,serif" font-size="12" font-weight="600" fill="#1A2B47" text-anchor="middle" dominant-baseline="middle" id="text96">21 cm²</text>
+    
+    <rect x="168" y="104" width="56" height="42" fill="#FDECEA" stroke="#243A5E" stroke-width="2" id="rect97" />
+    <text x="196" y="125" font-family="Georgia,serif" font-size="16" font-weight="bold" fill="#B83228" text-anchor="middle" dominant-baseline="middle" id="text97">?</text>
+    
+    <line x1="126" y1="50" x2="224" y2="50" stroke="#243A5E" stroke-width="1.5" id="line97" />
+    <line x1="126" y1="45" x2="126" y2="55" stroke="#243A5E" stroke-width="1.5" id="line98" />
+    <line x1="224" y1="45" x2="224" y2="55" stroke="#243A5E" stroke-width="1.5" id="line99" />
+    <text x="175" y="39" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" id="text99">7 cm</text>
+    
+    <line x1="168" y1="158" x2="224" y2="158" stroke="#243A5E" stroke-width="1.5" id="line100" />
+    <line x1="168" y1="153" x2="168" y2="163" stroke="#243A5E" stroke-width="1.5" id="line101" />
+    <line x1="224" y1="153" x2="224" y2="163" stroke="#243A5E" stroke-width="1.5" id="line102" />
+    <text x="196" y="172" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" id="text102">4 cm</text>
+    
+    <line x1="236" y1="104" x2="236" y2="146" stroke="#243A5E" stroke-width="1.5" id="line103" />
+    <line x1="231" y1="104" x2="241" y2="104" stroke="#243A5E" stroke-width="1.5" id="line104" />
+    <line x1="231" y1="146" x2="241" y2="146" stroke="#243A5E" stroke-width="1.5" id="line105" />
+    <text x="251" y="125" font-family="Georgia,serif" font-size="11" fill="#243A5E" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90,251,125)" id="text105">3 cm</text>
+    <line x1="10" y1="221" x2="340" y2="221" stroke="#DDD9D0" stroke-width="1" id="line106" />
+    <text x="15" y="235" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text106">Rectangle du haut : largeur 7 cm, aire 21 cm². Un rectangle</text>
+    <text x="15" y="251" font-family="Georgia,serif" font-size="11" fill="#3A3530" id="text107">(4 cm × 3 cm) lui est accolé en bas à droite. Quelle est son aire ?</text>
+    <line x1="10" y1="268" x2="340" y2="268" stroke="#C9943A" stroke-width="0.8" stroke-dasharray="4,3" id="line107" />
+    <text x="15" y="282" font-family="Georgia,serif" font-size="10.5" fill="#1D6640" font-style="italic" id="text108">Solution : hauteur = 21 ÷ 7 = 3 cm  →  4 × 3 = 12 cm²</text>
+    <text x="15" y="298" font-family="Georgia,serif" font-size="9.5" fill="#8A8070" font-style="italic" id="text109">La hauteur du grand rectangle est implicitement celle du petit.</text>
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle07.ggb')"
+            title="Ouvre 90puzzle07.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle07.ggb')"
+            title="Ouvre 90puzzle07.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle07.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s19')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s19" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Étape 1 — Trouver la hauteur du grand rectangle :</strong></p>
+<p class="formula">$$h = 21 \div 7 = \mathbf{3} \text{ cm}$$</p>
+<p><strong>Étape 2 — Aire du petit rectangle :</strong><br>La hauteur h=3 cm est <em>partagée</em> entre les deux rectangles.</p>
+<p class="formula">$$\mathcal{A}_{petit} = 4 \times 3 = \boxed{12 \text{ cm}^2}$$</p>
+<p class="note">La hauteur commune est <strong>implicite</strong> : elle ne figure pas sur la figure mais se retrouve par division.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s20')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s20" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Bloqué : ne voit pas la hauteur commune</td>
+<td class="err-exo">R7a</td>
+<td class="err-rem">«&nbsp;Que sais-tu du grand rectangle ?&nbsp;» Tracer la hauteur en rouge sur les deux rectangles.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">21 ÷ 4 = 5,25 cm (utilise la largeur du petit pour le grand)</td>
+<td class="err-exo">R7a</td>
+<td class="err-rem">On divise l'aire d'un rectangle par sa propre largeur. Ne jamais croiser.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">21 − 4 = <strong>17</strong> ou tentative d'addition</td>
+<td class="err-exo">R7b</td>
+<td class="err-rem">Pas de relation additive. La seule voie est de trouver h d'abord.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">21×4÷7 = <strong>12 cm²</strong> par proportionnalité <em>(résultat correct, non attendu)</em></td>
+<td class="err-exo">R7b</td>
+<td class="err-rem">Valider mais reformuler en passant par h. Institutionnaliser l'étape intermédiaire.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s21')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s21" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R7a — Associer aire et dimensions du bon rectangle</span> <span class="exo-tags">[E1, E2]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Grand rectangle (largeur <strong>9 cm</strong>, aire <strong>36 cm²</strong>) accolé en bas à droite d'un petit rectangle (largeur <strong>5 cm</strong>).</p><p><strong>a)</strong> Surligne en orange la hauteur commune.</p><p><strong>b)</strong> Calcule h en utilisant <em>uniquement</em> les données du grand rectangle.</p><p><strong>c)</strong> Calcule l'aire du petit rectangle.</p><p class="warn">On ne mélange jamais les données de deux rectangles différents.</p></div>
+<div class="exo-right"><svg width="360" height="300" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="15" width="270" height="120" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="170" y="75" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">36 cm²</text><rect x="155" y="135" width="150" height="120" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h9734" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="155" y="135" width="150" height="120" fill="url(#h9734)" stroke="#3464A3" stroke-width="0"/><text x="230" y="195" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M35,1 L305,1" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M45,-3 L35,1 L45,5" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M295,-3 L305,1 L295,5" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="170.0" y="-2" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">9 cm</text><path d="M155,271 L305,271" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M165,267 L155,271 L165,275" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M295,267 L305,271 L295,275" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="230.0" y="268" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">5 cm</text><path d="M319,15 L319,135" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M315,25 L319,15 L323,25" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M315,125 L319,135 L323,125" stroke="#C86414" stroke-width="1.5" fill="none"/><text x="334" y="75.0" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h=?</text><path d="M319,135 L319,255" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M315,145 L319,135 L323,145" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M315,245 L319,255 L323,245" stroke="#C86414" stroke-width="1.5" fill="none"/><text x="334" y="195.0" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R7b — Toujours passer par h</span> <span class="exo-tags">[E3, E4]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Trois configurations. Pour chacune, écris les deux étapes :</p><p>(1) Grand : 8 cm, 24 cm². Petit : 3 cm, aire ?</p><p>(2) Grand : 6 cm, 30 cm². Petit : 4 cm, aire ?</p><p>(3) Grand : 10 cm, 40 cm². Petit : 7 cm, aire ?</p><p class="note"><em>Rappel :</em> Étape 1 : \(h = \mathcal{A}_{grand} \div L_{grand}\)<br>Étape 2 : \(\mathcal{A}_{petit} = L_{petit} \times h\)</p></div>
+<div class="exo-right"><svg width="314" height="228" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="35" y="20" width="224" height="84" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="147" y="62" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">24 cm²</text><rect x="175" y="104" width="84" height="84" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h128" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="175" y="104" width="84" height="84" fill="url(#h128)" stroke="#3464A3" stroke-width="0"/><text x="217" y="146" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M35,6 L259,6" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M45,2 L35,6 L45,10" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M249,2 L259,6 L249,10" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="147.0" y="3" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">8 cm</text><path d="M175,204 L259,204" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M185,200 L175,204 L185,208" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M249,200 L259,204 L249,208" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="217.0" y="201" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">3 cm</text><path d="M273,20 L273,104" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M269,30 L273,20 L277,30" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M269,94 L273,104 L277,94" stroke="#C86414" stroke-width="1.5" fill="none"/><text x="288" y="62.0" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h=?</text><path d="M273,104 L273,188" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M269,114 L273,104 L277,114" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M269,178 L273,188 L277,178" stroke="#C86414" stroke-width="1.5" fill="none"/><text x="288" y="146.0" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">8</span>
+<span class="acc-title">La vérification double</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : trouver h, vérifier avec le 2e rectangle, calculer le 3e</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#fdfcf9" stroke="#ddd9d0" stroke-width="1.5" id="rect109" x="0.0" y="0.0" />
+  <rect width="350" height="34" fill="#243a5e" id="rect110" x="0.0" y="0.0" />
+  <circle cx="20.0" cy="17.0" r="11" fill="#c9943a" id="circle110" />
+  <text x="20.0" y="17.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" id="text110">8</text>
+  <text x="38.0" y="17.0" font-family="Georgia, serif" font-size="12px" font-weight="bold" fill="#ffffff" dominant-baseline="middle" id="text111">La vérification double</text>
+  <rect y="34.0" width="350" height="186" fill="#fafaf7" id="rect111" x="0.0" />
+  <rect x="65.0" y="87.0" width="44" height="100" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect112" />
+  <text x="87.0" y="137.0" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text112">10 cm²</text>
+  <rect x="109.0" y="87.0" width="110" height="100" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect113" />
+  <text x="164.0" y="137.0" font-family="Georgia, serif" font-size="12px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text113">25 cm²</text>
+  <rect x="219.0" y="87.0" width="66" height="100" fill="#fdecea" stroke="#243a5e" stroke-width="2" id="rect114" />
+  <text x="252.0" y="137.0" font-family="Georgia, serif" font-size="16px" font-weight="bold" fill="#b83228" text-anchor="middle" dominant-baseline="middle" id="text114">?</text>
+  <line x1="65.0" y1="74.0" x2="284.01500999999996" y2="74.0" stroke="#c9943a" stroke-width="2.14659" id="line114" />
+  <line x1="65.0" y1="69.0" x2="65.0" y2="79.0" stroke="#c9943a" stroke-width="1.8" id="line115" />
+  <line x1="285.0" y1="69.0" x2="285.0" y2="79.0" stroke="#c9943a" stroke-width="1.8" id="line116" />
+  <text x="172.0" y="64.0" font-family="Georgia, serif" font-size="11px" font-weight="bold" fill="#c9943a" text-anchor="middle" dominant-baseline="middle" id="text116">10 cm</text>
+  <line x1="65.0" y1="199.0" x2="285.0" y2="199.0" stroke="#243a5e" stroke-width="1.5" id="line117" />
+  <line x1="65.0" y1="194.0" x2="65.0" y2="204.0" stroke="#243a5e" stroke-width="1.5" id="line118" />
+  <line x1="109.0" y1="194.0" x2="109.0" y2="204.0" stroke="#243a5e" stroke-width="1.5" id="line119" />
+  <line x1="219.0" y1="194.0" x2="219.0" y2="204.0" stroke="#243a5e" stroke-width="1.5" id="line120" />
+  <line x1="285.0" y1="194.0" x2="285.0" y2="204.0" stroke="#243a5e" stroke-width="1.5" id="line121" />
+  <text x="87.0" y="214.0" font-family="Georgia, serif" font-size="10px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text121">2 cm</text>
+  <text x="164.0" y="214.0" font-family="Georgia, serif" font-size="10px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text122">5 cm</text>
+  <line x1="10.0" y1="221.0" x2="340.0" y2="221.0" stroke="#ddd9d0" stroke-width="1" id="line123" />
+  <text x="15.0" y="235.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text124">3 rectangles, même hauteur. Largeurs : 2, 5 et 3 cm.</text>
+  <text x="15.0" y="251.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text125">Aires : 10 et 25 cm². Confirmer la hauteur et trouver le 3ᵉ.</text>
+  <line x1="10.0" y1="268.0" x2="340.0" y2="268.0" stroke="#c9943a" stroke-width="0.8" stroke-dasharray="4, 3" id="line125" />
+  <text x="15.0" y="282.0" font-family="Georgia, serif" font-size="10.5px" fill="#1d6640" font-style="italic" id="text126">Solution : h = 10÷2 = 5 cm (vérif. 5×5=25 ✓) → 3×5 = 15 cm²</text>
+  <text x="15.0" y="298.0" font-family="Georgia, serif" font-size="9.5px" fill="#8a8070" font-style="italic" id="text127">Le crochet en orange montre que 2+5=7 cm couvre les 2 premiers.</text>
+  
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle08.ggb')"
+            title="Ouvre 90puzzle08.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle08.ggb')"
+            title="Ouvre 90puzzle08.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle08.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s22')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s22" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Étape 1 — Hauteur commune :</strong></p>
+<p class="formula">$$h = 10 \div 2 = \mathbf{5} \text{ cm}$$</p>
+<p><strong>Vérification obligatoire avec le 2e rectangle :</strong></p>
+<p class="formula">$$5 \times 5 = 25 \text{ cm}^2 \quad ✓$$</p>
+<p><strong>Étape 2 — Aire du 3e rectangle :</strong></p>
+<p class="formula">$$\mathcal{A} = 3 \times 5 = \boxed{15 \text{ cm}^2}$$</p>
+<p class="note">Les deux rectangles connus confirment la même hauteur : la vérification est la marque d'un raisonnement rigoureux.</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s23')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s23" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">10 + 25 = <strong>35 cm²</strong></td>
+<td class="err-exo">R8a</td>
+<td class="err-rem">Les aires servent à retrouver h, pas à composer l'aire cherchée.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Trouve h, saute la vérif, réutilise la largeur du 1er : 3×2 = <strong>6 cm²</strong></td>
+<td class="err-exo">R8b</td>
+<td class="err-rem">La vérification est une étape explicite obligatoire.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">Calcule h avec le 2e rect (résultat juste) mais vérif absente</td>
+<td class="err-exo">R8b</td>
+<td class="err-rem">Confirmer h avec le 1er rectangle. Les deux doivent converger.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">Prend h=10 (l'aire!), puis 3×10 = <strong>30 cm²</strong></td>
+<td class="err-exo">R8a</td>
+<td class="err-rem">Hauteur en cm, pas en cm². h se calcule : h = 10÷2 = 5 cm.</td>
+</tr><tr>
+<td class="err-num">E5</td>
+<td class="err-desc">10 ÷ (2+5) ≈ <strong>1,43 cm</strong> (divise par la somme des largeurs)</td>
+<td class="err-exo">R8a</td>
+<td class="err-rem">On divise l'aire d'un rectangle par sa propre largeur, pas la somme.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s24')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s24" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R8a — La bonne largeur pour diviser</span> <span class="exo-tags">[E1, E4, E5]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Trois rectangles, même hauteur. Largeurs : <strong>4, 6, 5 cm</strong>.</p><p>Aire du 1er : <strong>20 cm²</strong>. Aire du 2e : <strong>30 cm²</strong>.</p><p><strong>a)</strong> Calcule h avec le 1er rectangle. <em>(Utilise uniquement 4 cm.)</em></p><p><strong>b)</strong> Vérifie avec le 2e rectangle.</p><p><strong>c)</strong> Calcule l'aire du 3e rectangle.</p><p class="warn">On ne divise jamais par 4+6 ou 4+6+5.</p></div>
+<div class="exo-right"><svg width="470" height="200" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="30" y="20" width="104" height="130" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="82" y="85" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">20 cm²</text><rect x="134" y="20" width="156" height="130" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="212" y="85" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">30 cm²</text><rect x="290" y="20" width="130" height="130" fill="#F8D2CF" stroke="#3464A3" stroke-width="2"/><defs><pattern id="h1155" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="8" stroke="#B43C32" stroke-width="1.4" opacity="0.5"/></pattern></defs><rect x="290" y="20" width="130" height="130" fill="url(#h1155)" stroke="#3464A3" stroke-width="0"/><text x="355" y="85" fill="#B43C32" font-size="16" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><path d="M30,166 L134,166" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,162 L30,166 L40,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M124,162 L134,166 L124,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="82.0" y="163" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text><path d="M134,166 L290,166" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M144,162 L134,166 L144,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M280,162 L290,166 L280,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="212.0" y="163" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6 cm</text><path d="M290,166 L420,166" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M300,162 L290,166 L300,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M410,162 L420,166 L410,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="355.0" y="163" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">5 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R8b — La vérification comme étape obligatoire</span> <span class="exo-tags">[E2, E3]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Dans chaque cas, deux rectangles donnent une information sur h.<br>Les deux calculs doivent donner le même h.</p><p><strong>Cas 1 :</strong><br>Rect. A : 3 cm, 12 cm² → h = ___<br>Rect. B : 4 cm, 16 cm² → h = ___<br>Coïncident ? ☐ Oui ☐ Non</p><p><strong>Cas 2 (piège) :</strong><br>Rect. A : 2 cm, 10 cm² → h = ___<br>Rect. B : 3 cm, 18 cm² → h = ___<br>Coïncident ? ☐ Oui ☐ Non</p><p class="warn">Si non : les rectangles ne partagent pas la même hauteur !</p></div>
+<div class="exo-right"><svg width="328" height="352" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><rect x="30" y="20" width="102" height="136" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="81" y="88" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">12 cm²</text><rect x="132" y="20" width="136" height="136" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="200" y="88" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">16 cm²</text><path d="M30,170 L132,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,166 L30,170 L40,174" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M122,166 L132,170 L122,174" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="81.0" y="167" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">3 cm</text><path d="M132,170 L268,170" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M142,166 L132,170 L142,174" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M258,166 L268,170 L258,174" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="200.0" y="167" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">4 cm</text><text x="149" y="8" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Cas 1</text><rect x="30" y="200" width="68" height="136" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><text x="64" y="268" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">10 cm²</text><rect x="98" y="200" width="102" height="204" fill="#FCE4C3" stroke="#C86414" stroke-width="2"/><text x="149" y="302" fill="#C86414" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">18 cm²</text><path d="M30,418 L98,418" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,414 L30,418 L40,422" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M88,414 L98,418 L88,422" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="64.0" y="415" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">2 cm</text><path d="M98,418 L200,418" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M108,414 L98,418 L108,422" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M190,414 L200,418 L190,422" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="149.0" y="415" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">3 cm</text><text x="115" y="188" fill="#C86414" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">Cas 2 — piège !</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">9</span>
+<span class="acc-title">Triangle et rectangles</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Méthode : \(\mathcal{A} = \frac{1}{2} \times b \times h\)</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#fdfcf9" stroke="#ddd9d0" stroke-width="1.5" id="rect127" x="0.0" y="0.0" />
+  <rect width="350" height="34" fill="#243a5e" id="rect128" x="0.0" y="0.0" />
+  <circle cx="20.0" cy="17.0" r="11" fill="#c9943a" id="circle128" />
+  <text x="20.0" y="17.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" id="text128">9</text>
+  <text x="38.0" y="17.0" font-family="Georgia, serif" font-size="12px" font-weight="bold" fill="#ffffff" dominant-baseline="middle" id="text129">Triangle et rectangles</text>
+  <rect y="34.0" width="350" height="186" fill="#fafaf7" id="rect129" x="0.0" />
+  <rect x="90.0" y="130.0" width="100" height="80" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect130" />
+  <text x="140.0" y="170.0" font-family="Georgia, serif" font-size="12px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text130">20 cm²</text>
+  <rect x="190.0" y="50.0" width="60" height="80" fill="#e4ebf5" stroke="#243a5e" stroke-width="2" id="rect131" />
+  <text x="220.0" y="90.0" font-family="Georgia, serif" font-size="12px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text131">12 cm²</text>
+  <text x="157.0" y="103.0" font-family="Georgia, serif" font-size="16px" font-weight="bold" fill="#b83228" text-anchor="middle" dominant-baseline="middle" id="text132">?</text>
+  <line x1="190.0" y1="38.0" x2="250.0" y2="38.0" stroke="#243a5e" stroke-width="1.5" id="line132" />
+  <line x1="190.0" y1="33.0" x2="190.0" y2="43.0" stroke="#243a5e" stroke-width="1.5" id="line133" />
+  <line x1="250.0" y1="33.0" x2="250.0" y2="43.0" stroke="#243a5e" stroke-width="1.5" id="line134" />
+  <text x="220.0" y="29.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text134">3 cm</text>
+  <line x1="78.0" y1="130.0" x2="78.0" y2="210.0" stroke="#243a5e" stroke-width="1.5" id="line135" />
+  <line x1="73.0" y1="130.0" x2="83.0" y2="130.0" stroke="#243a5e" stroke-width="1.5" id="line136" />
+  <line x1="73.0" y1="210.0" x2="83.0" y2="210.0" stroke="#243a5e" stroke-width="1.5" id="line137" />
+  <line x1="10.0" y1="221.0" x2="340.0" y2="221.0" stroke="#ddd9d0" stroke-width="1" id="line138" />
+  <text x="15.0" y="235.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text138">Triangle (haché) accolé à deux rectangles. On connaît</text>
+  <text x="15.0" y="251.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text139">3 cm, 4 cm, 12 cm² et 20 cm². Quelle est l'aire du triangle ?</text>
+  <line x1="10.0" y1="268.0" x2="340.0" y2="268.0" stroke="#c9943a" stroke-width="0.8" stroke-dasharray="4, 3" id="line139" />
+  <text x="15.0" y="282.0" font-family="Georgia, serif" font-size="10.5px" fill="#1d6640" font-style="italic" id="text140">Solution : base=20÷4=5 cm, hauteur=4 cm → 5×4÷2 = 10 cm²</text>
+  <text x="15.0" y="298.0" font-family="Georgia, serif" font-size="9.5px" fill="#8a8070" font-style="italic" id="text141">Les rectangles donnent les deux cathètes du triangle. Aire = b×h÷2.</text>
+  
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle09.ggb')"
+            title="Ouvre 90puzzle09.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle09.ggb')"
+            title="Ouvre 90puzzle09.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle09.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s25')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s25" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Identification des éléments du triangle :</strong></p>
+<ul>
+<li><strong>Base</strong> b = segment horizontal commun → b = 5 cm<br><em>(déduite de l'aire du rectangle gauche : 20 ÷ 4 = 5 cm)</em></li>
+<li><strong>Hauteur</strong> h = côté vertical, angle droit indiqué → h = 4 cm</li>
+</ul>
+<p class="formula">$$\mathcal{A}_{\triangle} = \frac{1}{2} \times b \times h = \frac{1}{2} \times 5 \times 4 = \frac{20}{2} = \boxed{10 \text{ cm}^2}$$</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s26')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s26" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Oubli du ½ : 5×4 = <strong>20 cm²</strong></td>
+<td class="err-exo">R9-1</td>
+<td class="err-rem">Montrer que le triangle est la moitié exacte du rectangle b×h.</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">½×<strong>3</strong>×4 = <strong>6 cm²</strong> (prend la largeur du rectangle droit)</td>
+<td class="err-exo">R9-2</td>
+<td class="err-rem">Identifier et surligner les 3 sommets du triangle, désigner la base.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">Confond hauteur et hypoténuse : mesure la diagonale</td>
+<td class="err-exo">R9-1, R9-2</td>
+<td class="err-rem">La hauteur est toujours perpendiculaire à la base. Repérer l'angle droit.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">20 + 12 = <strong>32 cm²</strong></td>
+<td class="err-exo">R9-3</td>
+<td class="err-rem">Distinguer les données (rectangles bleus) de l'inconnue (triangle). La formule ne dépend pas des aires données.</td>
+</tr><tr>
+<td class="err-num">E5</td>
+<td class="err-desc">20 − 12 = <strong>8 cm²</strong></td>
+<td class="err-exo">R9-3</td>
+<td class="err-rem">Même remédiation que E4. Les régions sont indépendantes.</td>
+</tr><tr>
+<td class="err-num">E6</td>
+<td class="err-desc">½×3×4×2 ou ½×5×3 (dimensions du rectangle droit)</td>
+<td class="err-exo">R9-2</td>
+<td class="err-rem">Décomposer terme à terme sur la figure. Tracer base en rouge, hauteur en bleu.</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s27')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s27" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R9-1 — Le triangle est la moitié du rectangle</span> <span class="exo-tags">[E1, E3]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Rectangle <strong>6 cm × 5 cm</strong>. Sa diagonale le partage en deux triangles identiques.</p><p><strong>a)</strong> Calcule l'aire du rectangle.</p><p><strong>b)</strong> Déduis l'aire d'un triangle.</p><p><strong>c)</strong> Vérifie avec \(\mathcal{A} = \frac{1}{2} \times b \times h\).</p><p class="note"><em>Les deux triangles se superposent parfaitement.</em></p></div>
+<div class="exo-right"><!-- R9-1 SVG handled below --></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R9-2 — Identifier base et hauteur</span> <span class="exo-tags">[E2, E3]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Figure composée d'un rectangle bleu (12 cm²) et d'un triangle hachuré.</p><p><strong>a)</strong> Identifie les 3 sommets du triangle : A, B, C.</p><p><strong>b)</strong> Surligne en <span style="color:#B43C32;font-weight:bold">rouge</span> la base, en <span style="color:#3464A3;font-weight:bold">bleu</span> la hauteur.</p><p><strong>c)</strong> Calcule l'aire du triangle.</p><p class="note"><em>La hauteur est le côté avec l'angle droit.</em></p></div>
+<div class="exo-right"><!-- R9-2 SVG handled below --></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R9-3 — Distinguer données et inconnue</span> <span class="exo-tags">[E4, E5]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Les aires en bleu (24 cm² et 8 cm²) sont <strong>données</strong>. L'aire du triangle est à calculer.</p><p><strong>a)</strong> Complète : «&nbsp;Je connais ___ et ___. Je cherche ___.&nbsp;»</p><p><strong>b)</strong> Quelles mesures utilises-tu dans \(\frac{1}{2}×b×h\) ?</p><p><strong>c)</strong> Calcule l'aire du triangle.</p><p class="warn">Les aires données ne servent pas dans la formule !</p></div>
+<div class="exo-right"><!-- R9-3 SVG handled below --></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="accordion-item">
+<button class="accordion-btn" onclick="toggleAcc(this)">
+<span class="acc-num">10</span>
+<span class="acc-title">Le trapèze découpé</span>
+<span class="acc-arrow">▼</span>
+</button>
+<div class="accordion-content" style="display:none">
+
+<div class="fig-meta">Stratégie : l'inconnue est une longueur ; trouver h en doublant les triangles</div>
+<div class="fig-columns">
+<div class="fig-problem"><div class="problem-panel">
+<svg width="350" height="310" viewBox="0 0 350 310" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;">
+<defs xmlns="http://www.w3.org/2000/svg" id="defs1">
+    <pattern id="hatch9" patternUnits="userSpaceOnUse" width="9" height="9" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="9" stroke="#D4786A" stroke-width="1.4" opacity="0.55" id="line1" />
+    </pattern>
+  </defs>
+  
+  
+  
+<g xmlns="http://www.w3.org/2000/svg"><rect width="350" height="310" fill="#fdfcf9" stroke="#ddd9d0" stroke-width="1.5" id="rect141" x="0.0" y="0.0" />
+  <rect width="350" height="34" fill="#243a5e" id="rect142" x="0.0" y="0.0" />
+  <circle cx="20.0" cy="17.0" r="11" fill="#c9943a" id="circle142" />
+  <text x="20.0" y="17.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#ffffff" text-anchor="middle" dominant-baseline="middle" id="text142">10</text>
+  <text x="38.0" y="17.0" font-family="Georgia, serif" font-size="12px" font-weight="bold" fill="#ffffff" dominant-baseline="middle" id="text143">Le trapèze découpé</text>
+  <rect y="34.0" width="350" height="186" fill="#fafaf7" id="rect143" x="0.0" />
+  <text x="75.0" y="158.0" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text144">10 cm²</text>
+  <rect x="105.0" y="85.0" width="100" height="100" fill="#fdecea" stroke="#243a5e" stroke-width="2" id="rect144" />
+  <text x="248.0" y="158.0" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text146">15 cm²</text>
+  <text x="153.29931999999997" y="157.1615999999999" font-family="Georgia, serif" font-size="11px" font-weight="600" fill="#1a2b47" text-anchor="middle" dominant-baseline="middle" id="text146-4">25 cm²</text>
+  <line x1="105.0" y1="73.0" x2="205.0" y2="73.0" stroke="#b83228" stroke-width="1.8" id="line146" />
+  <line x1="105.0" y1="68.0" x2="105.0" y2="78.0" stroke="#b83228" stroke-width="1.8" id="line147" />
+  <line x1="205.0" y1="68.0" x2="205.0" y2="78.0" stroke="#b83228" stroke-width="1.8" id="line148" />
+  <text x="155.0" y="62.0" font-family="Georgia, serif" font-size="13px" font-weight="bold" fill="#b83228" text-anchor="middle" dominant-baseline="middle" id="text148">?</text>
+  <line x1="25.0" y1="197.0" x2="325.0" y2="197.0" stroke="#243a5e" stroke-width="1.5" id="line149" />
+  <line x1="25.0" y1="192.0" x2="25.0" y2="202.0" stroke="#243a5e" stroke-width="1.5" id="line150" />
+  <line x1="325.0" y1="192.0" x2="325.0" y2="202.0" stroke="#243a5e" stroke-width="1.5" id="line151" />
+  <text x="175.0" y="214.0" font-family="Georgia, serif" font-size="11px" fill="#243a5e" text-anchor="middle" dominant-baseline="middle" id="text151">15 cm</text>
+  <line x1="10.0" y1="221.0" x2="340.0" y2="221.0" stroke="#ddd9d0" stroke-width="1" id="line152" />
+  <text x="15.0" y="235.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text152">Trapèze découpé en 3 : deux triangles (10 et 15 cm²) encadrent</text>
+  <text x="15.0" y="251.0" font-family="Georgia, serif" font-size="11px" fill="#3a3530" id="text153">un rectangle. Base totale = 15 cm. Quelle est la largeur du rectangle ?</text>
+  <line x1="10.0" y1="268.0" x2="340.0" y2="268.0" stroke="#c9943a" stroke-width="0.8" stroke-dasharray="4, 3" id="line153" />
+  <text x="15.0" y="282.0" font-family="Georgia, serif" font-size="10.5px" fill="#1d6640" font-style="italic" id="text154">Solution : h=75÷15=5 cm → ?=25÷5=5 cm (b_L=4, b_R=6 ✓)</text>
+  <text x="15.0" y="298.0" font-family="Georgia, serif" font-size="9.5px" fill="#8a8070" font-style="italic" id="text155">Ici c'est une longueur qui est inconnue, et non une aire.</text>
+  
+  </g>
+</svg>
+<div class="ggb-bar">
+  <span class="ggb-icon">
+    <svg width="20" height="20" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="100" cy="100" r="95" fill="#5487C2"/>
+      <path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"/>
+      <circle cx="100" cy="105" r="28" fill="#5487C2"/>
+    </svg>
+  </span>
+  <span class="ggb-label">GeoGebra</span>
+  <div class="ggb-btns">
+    <button class="ggb-btn" onclick="openGgb('90puzzle10.ggb')"
+            title="Ouvre 90puzzle10.ggb dans GeoGebra Desktop (si installé)">
+      🖥 Desktop
+    </button>
+    <button class="ggb-btn-browser" onclick="openGgbBrowser('90puzzle10.ggb')"
+            title="Ouvre 90puzzle10.ggb dans le navigateur (GeoGebra Web)">
+      🌐 Navigateur
+    </button>
+  </div>
+  <span class="ggb-filename">90puzzle10.ggb</span>
+</div>
+</div></div>
+<div class="fig-sections">
+<div class="sec-wrap">
+<button class="sec-btn btn-vert" onclick="toggle('s28')">
+  <span class="sec-icon">▶</span> ✓ Correction rédigée
+</button>
+<div id="s28" class="sec-content" style="display:none">
+<div class="corr-box"><p><strong>Structure :</strong> triangle gauche (10 cm²) + rectangle central (25 cm², largeur inconnue) + triangle droit (15 cm²)</p>
+<p><strong>Étape 1 — Trouver h (astuce : doubler les triangles) :</strong></p>
+<p class="formula">$$(b_L + \text{larg.} + b_R) \times h = 2\times10 + 25 + 2\times15 = 75$$</p>
+<p class="formula">$$15 \times h = 75 \Rightarrow h = 75 \div 15 = \mathbf{5} \text{ cm}$$</p>
+<p><strong>Étape 2 — Largeur du rectangle central :</strong></p>
+<p class="formula">$$\text{largeur} = 25 \div 5 = \boxed{5 \text{ cm}}$$</p>
+<p><strong>Vérifications :</strong> \(b_L = 20\div5 = 4\) cm, \(b_R = 30\div5 = 6\) cm, \(4+5+6 = 15\) cm ✓</p>
+<p class="note">L'inconnue est une <strong>longueur</strong> (cm), non une aire (cm²). L'astuce : réécrire les aires des triangles comme \(\frac{1}{2}×b×h\) pour faire apparaître \(15×h\).</p></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-rouge" onclick="toggle('s29')">
+  <span class="sec-icon">▶</span> ⚠ Erreurs attendues et remédiations
+</button>
+<div id="s29" class="sec-content" style="display:none">
+<div class="err-table-wrap">
+<table class="err-table">
+<thead><tr>
+<th>#</th><th>Erreur typique — résultat obtenu</th><th>Exo</th><th>Remédiation</th>
+</tr></thead>
+<tbody><tr>
+<td class="err-num">E1</td>
+<td class="err-desc">Répond 50 cm² = 10+25+15 (cherche une aire au lieu d'une longueur)</td>
+<td class="err-exo">R10a</td>
+<td class="err-rem">Relire la consigne : la réponse est en cm, pas en cm².</td>
+</tr><tr>
+<td class="err-num">E2</td>
+<td class="err-desc">Bloqué : deux inconnues (h et largeur)</td>
+<td class="err-exo">R10b</td>
+<td class="err-rem">«&nbsp;Si tu connaissais h, saurais-tu trouver la largeur ?&nbsp;» Puis montrer comment les trois aires donnent h.</td>
+</tr><tr>
+<td class="err-num">E3</td>
+<td class="err-desc">50 ÷ 15 ≈ 3,33 cm (additionne sans doubler les triangles)</td>
+<td class="err-exo">R10b</td>
+<td class="err-rem">\(\mathcal{A}_{\triangle} = \frac{1}{2}×b×h \Rightarrow b×h = 2\mathcal{A}\). Il faut doubler pour retrouver le produit b×h.</td>
+</tr><tr>
+<td class="err-num">E4</td>
+<td class="err-desc">Répond <strong>15 cm</strong> (confond largeur du rect. et base totale)</td>
+<td class="err-exo">R10a</td>
+<td class="err-rem">La base totale (15 cm) est la somme des trois bases. La largeur du rectangle central est à calculer.</td>
+</tr><tr>
+<td class="err-num">E5</td>
+<td class="err-desc">Applique ½×b×h au rectangle aussi</td>
+<td class="err-exo">R10b</td>
+<td class="err-rem">La formule avec ½ s'applique uniquement aux triangles. Faire classer les 3 pièces avant tout calcul.</td>
+</tr><tr>
+<td class="err-num">E6</td>
+<td class="err-desc">h=5 cm correct mais divise la mauvaise aire : 10÷5=2 cm ou 15÷5=3 cm</td>
+<td class="err-exo">R10a</td>
+<td class="err-rem">«&nbsp;L'inconnue est la largeur du rectangle central.&nbsp;» Repérer la bonne aire (25 cm²).</td>
+</tr></tbody>
+</table></div>
+</div>
+</div>
+<div class="sec-wrap">
+<button class="sec-btn btn-orange" onclick="toggle('s30')">
+  <span class="sec-icon">▶</span> ✏ Exercices de remédiation
+</button>
+<div id="s30" class="sec-content" style="display:none">
+<div class="exo-box">
+<div class="exo-header"><span class="exo-title">R10a — Identifier la nature de l'inconnue</span> <span class="exo-tags">[E1, E4, E6]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Rectangle flanqué de deux triangles rectangles. <strong>h = 4 cm</strong> connue.</p><p>Aire tri. gauche : 8 cm². Aire rectangle : 20 cm². Aire tri. droit : 12 cm².</p><p><strong>a)</strong> L'inconnue «&nbsp;?&nbsp;» est : ☐ une aire (cm²) &nbsp; ☐ une longueur (cm)</p><p><strong>b)</strong> Retrouve la largeur du rectangle central.</p><p><strong>c)</strong> Calcule b_L et b_R.</p><p><strong>d)</strong> Vérifie que b_L + largeur + b_R est cohérent.</p></div>
+<div class="exo-right"><svg width="410" height="208" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><polygon points="30,158 94,30 94,158" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><polyline points="102,158 102,166 94,166" fill="none" stroke="#3464A3" stroke-width="1.5"/><text x="54" y="126" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">8 cm²</text><rect x="94" y="30" width="160" height="128" fill="#D2F0D7" stroke="#3C8C50" stroke-width="2"/><text x="174" y="94" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">20 cm²</text><path d="M94,16 L254,16" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M104,12 L94,16 L104,20" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M244,12 L254,16 L244,20" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="174.0" y="13" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><polygon points="254,30 254,158 350,158" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><polyline points="246,158 246,166 254,166" fill="none" stroke="#3464A3" stroke-width="1.5"/><text x="286" y="126" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">12 cm²</text><path d="M364,30 L364,158" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M360,40 L364,30 L368,40" stroke="#C86414" stroke-width="1.5" fill="none"/><path d="M360,148 L364,158 L368,148" stroke="#C86414" stroke-width="1.5" fill="none"/><text x="379" y="94.0" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h=4 cm</text></svg></div>
+</div>
+</div><div class="exo-box">
+<div class="exo-header"><span class="exo-title">R10b — Retrouver h quand il est inconnu</span> <span class="exo-tags">[E2, E3, E5]</span></div>
+<div class="exo-body">
+<div class="exo-left"><p>Même configuration. Base totale : <strong>12 cm</strong>. h : <strong>inconnue</strong>.</p><p>Aire tri. gauche : 6 cm². Aire rect. : 15 cm². Aire tri. droit : 9 cm².</p><p><strong>a)</strong> Complète :<br>\(b_L×h = 2×\_\_ = \_\_\)<br>\(b_R×h = 2×\_\_ = \_\_\)<br>Larg.×h = ___</p><p><strong>b)</strong> \((b_L+\text{larg.}+b_R)×h = 12×h = \_\_\_\)</p><p><strong>c)</strong> Déduis h, puis la largeur du rectangle.</p><p class="warn">Astuce : les triangles se «&nbsp;doublent&nbsp;» pour retrouver b×h.</p></div>
+<div class="exo-right"><svg width="410" height="186" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto;"><polygon points="30,126 94,30 94,126" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><polyline points="102,126 102,134 94,134" fill="none" stroke="#3464A3" stroke-width="1.5"/><text x="54" y="94" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">6 cm²</text><rect x="94" y="30" width="160" height="96" fill="#D2F0D7" stroke="#3C8C50" stroke-width="2"/><text x="174" y="78" fill="#3464A3" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="middle">15 cm²</text><path d="M94,16 L254,16" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M104,12 L94,16 L104,20" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M244,12 L254,16 L244,20" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="174.0" y="13" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">?</text><polygon points="254,30 254,126 350,126" fill="#D2E4F7" stroke="#3464A3" stroke-width="2"/><polyline points="246,126 246,134 254,134" fill="none" stroke="#3464A3" stroke-width="1.5"/><text x="286" y="94" fill="#3464A3" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">9 cm²</text><path d="M30,146 L350,146" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M40,142 L30,146 L40,150" stroke="#B43C32" stroke-width="1.5" fill="none"/><path d="M340,142 L350,146 L340,150" stroke="#B43C32" stroke-width="1.5" fill="none"/><text x="190.0" y="143" fill="#B43C32" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="middle">12 cm</text><line x1="372" y1="30" x2="372" y2="126" stroke="#C86414" stroke-width="1.5" stroke-dasharray="5,3"/><text x="388" y="78" fill="#C86414" font-size="11" font-weight="bold" text-anchor="start" dominant-baseline="middle">h=?</text></svg></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+function toggleAcc(btn) {
+  const c = btn.nextElementSibling;
+  const open = c.style.display !== 'none';
+  c.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('open', !open);
+}
+function toggle(id) {
+  const el = document.getElementById(id);
+  const btn = el.previousElementSibling;
+  const open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  btn.classList.toggle('open', !open);
+  const ic = btn.querySelector('.sec-icon');
+  if (ic) ic.style.transform = open ? '' : 'rotate(90deg)';
+}
+function openAll() {
+  document.querySelectorAll('.accordion-content').forEach(el => {
+    el.style.display = 'block';
+    const b = el.previousElementSibling;
+    if (b) b.classList.add('open');
+  });
+}
+function closeAll() {
+  document.querySelectorAll('.accordion-content').forEach(el => {
+    el.style.display = 'none';
+    const b = el.previousElementSibling;
+    if (b) b.classList.remove('open');
+  });
+}
+
+/* ── Toast ──────────────────────────────────────────────── */
+function showToast(msg) {
+  const t = document.getElementById('ggb-toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 4000);
+}
+
+/* ── GeoGebra Desktop ───────────────────────────────────── */
+function openGgb(filename) {
+  window.open(filename, '_blank');
+  showToast('\u25b6 Ouverture de ' + filename + ' dans GeoGebra Desktop\u2026');
+}
+
+/* ── GeoGebra Navigateur ────────────────────────────────── */
+function openGgbBrowser(filename) {
+  const input = document.getElementById('ggb-file-input');
+  input._ggbName = filename;
+  input.value = '';
+  input.click();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('ggb-file-input')
+    .addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      showToast('\u23f3 Chargement de ' + file.name + '\u2026');
+      const reader = new FileReader();
+      reader.onload = function (ev) {
+        const bytes = new Uint8Array(ev.target.result);
+        let bin = '';
+        const CHUNK = 8192;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+        }
+        window._ggbPending = { b64: btoa(bin), name: file.name };
+        _openGgbPage(file.name);
+      };
+      reader.readAsArrayBuffer(file);
+    });
+});
+
+function _openGgbPage(filename) {
+  // GeoGebra page built by string concatenation (avoids parser issues)
+  var sc  = 'sc' + 'ript';
+  var p1 = '<!DOCTYPE html><html lang="fr"><head>'
+         + '<meta charset="UTF-8">'
+         + '<title>GeoGebra \u2014 ' + filename + '<\/title>'
+         + '<style>'
+         + '*{margin:0;padding:0;box-sizing:border-box}'
+         + 'body{display:flex;flex-direction:column;height:100vh;font-family:sans-serif;background:#f0f4f8}'
+         + '#bar{background:#243a5e;color:white;padding:9px 16px;display:flex;align-items:center;gap:10px;font-size:.9rem;flex-shrink:0}'
+         + '#wrap{flex:1;position:relative;overflow:hidden}'
+         + '<\/style>'
+         + '<' + sc + ' src="https://www.geogebra.org/apps/deployggb.js"><\/' + sc + '>'
+         + '<\/head><body>'
+         + '<div id="bar">'
+         + '<svg width="22" height="22" viewBox="0 0 200 200">'
+         + '<circle cx="100" cy="100" r="95" fill="#5487C2"\/>'
+         + '<path d="M100 30 L30 160 L170 160 Z" fill="white" opacity=".9"\/>'
+         + '<circle cx="100" cy="105" r="28" fill="#5487C2"\/>'
+         + '<\/svg>'
+         + '<strong>GeoGebra<\/strong>'
+         + '<span style="opacity:.7;margin-left:6px">' + filename + '<\/span>'
+         + '<\/div>'
+         + '<div id="wrap"><\/div>';
+
+  var p2 = '<' + sc + '>'
+         + 'window.addEventListener("load",function(){'
+         + '  var data=window.opener&&window.opener._ggbPending;'
+         + '  if(!data){document.getElementById("wrap").innerHTML="<p style=\'padding:30px;color:red\'>Erreur : donn\u00e9es introuvables.<\/p>";return;}'
+         + '  var W=document.getElementById("wrap");'
+         + '  new GGBApplet({'
+         + '    appName:"classic",'
+         + '    ggbBase64:data.b64,'
+         + '    width:W.clientWidth||window.innerWidth,'
+         + '    height:W.clientHeight||(window.innerHeight-42),'
+         + '    showMenuBar:true,'
+         + '    showToolBar:true,'
+         + '    showAlgebraInput:true,'
+         + '    enableRightClick:true,'
+         + '    enableShiftDragZoom:true,'
+         + '    allowStyleBar:true'
+         + '  },true).inject("wrap");'
+         + '  window.opener._ggbPending=null;'
+         + '});'
+         + '<\/' + sc + '><\/body><\/html>';
+
+  var html = p1 + p2;
+  var blob = new Blob([html], { type: 'text/html' });
+  var url  = URL.createObjectURL(blob);
+  var win  = window.open(url, '_blank');
+  if (!win) {
+    showToast('\u26a0 Popup bloqu\u00e9e \u2014 autorise les popups pour ce site');
+  } else {
+    showToast('\u2713 GeoGebra ouvert dans une nouvelle fen\u00eatre');
+  }
+}
+</script>
+<input type="file" id="ggb-file-input" accept=".ggb" style="display:none">
+<div id="ggb-toast" class="ggb-toast"></div>
+</body>
+</html>
